@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import {AfterViewInit, Component} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import * as monaco from 'monaco-editor';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,12 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  title = 'qilinbot.web';
+export class AppComponent implements AfterViewInit{
+
+  ngAfterViewInit(){
+    monaco.editor.create(document.getElementById('container')!, {
+      value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
+      language: 'javascript'
+    });
+  }
 }
