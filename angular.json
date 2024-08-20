@@ -39,6 +39,10 @@
         "build": {
           "builder": "@angular-builders/custom-webpack:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "monaco-editor",
+              "style-loader"
+            ],
             "customWebpackConfig": {
               "path": "./webpack.config.js"
             },
