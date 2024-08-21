@@ -1,4 +1,27 @@
-#container{
+::ng-deep #container{
   width: 100%;
   height: 100vh;
+  .myGlyphMarginClass {
+    background-color: red;
+    width: 16px;
+    left: 10px;
+    top: 7px;
+    height: 16px;
+    border-radius: 50%; /* 添加边框半径，使其成为圆形 */
+
+  }
+
+  .contentClass {
+    background-color: rgba(255, 0, 0, 0.2); /* 使用更明显的背景色 */
+  }
+
+  .imageContent {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+
+
 }
+

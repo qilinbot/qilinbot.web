@@ -1,6 +1,7 @@
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const path = require('path');
 
+// todo 字体文件的打包存在未加载 目前通过link引入
 module.exports = {
   entry: {
     main: './src/main.ts',
@@ -15,13 +16,18 @@ module.exports = {
       {
         test: /\.css$/,
         use: ['style-loader', {
-          loader: 'css-loader', options: {
-            url: false,
+          loader: 'css-loader',
+          options: {
+            url: true,
           }
         }],
       },
       {
         test: /\.ttf$/,
+        include: [
+          path.resolve(__dirname, 'src'),  // 项目源代码路径
+          path.resolve(__dirname, 'node_modules/monaco-editor') // monaco-editor 路径
+        ],
         use: [
           {
             loader: 'file-loader',
