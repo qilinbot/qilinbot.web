@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import {Environment} from "../environments/environment";
+import {HttpService} from "../core/http.service";
 
 type AppType = 'xpa';
 
-export interface UserInfo {
+export interface userInfo {
   userId?: string;
   userName: string;
   face: any;
@@ -15,112 +13,103 @@ export interface UserInfo {
   email?: string;
   password?: string;
   birthday: number;
-  appType: AppType;
+  appType: AppType
 }
-
-@Injectable({
-  providedIn: 'root',
-})
+// todo 邮箱和手机验证码的接口暂时不用
+@Injectable()
 export class UserService {
-  // 替换为实际API地址
-  private apiUrl = Environment.restHost;
-
-  constructor(private http: HttpClient) {}
+  constructor(protected http: HttpService) {}
 
   /**
    * 读取用户列表
    * @param params
    */
-  readUsers(params: any): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users`, { params });
+  public readUsers(params: any) {
+    return this.http.post('/User/userList', params);
   }
 
   /**
    * 查看用户信息
    * @param userId
    */
-  getUserInfo(userId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${userId}`);
+  public getUserInfo(userId: string) {
+    return this.http.post('/User/userInfo', {userId: userId});
   }
 
   /**
    * 查看用户详情
    */
-  getUserDetail(userId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/details/${userId}`);
+  public getUserDetail(userId: string) {
+    return this.http.post('/User/userDetail', {userId: userId});
   }
 
   /**
    * 删除用户
    */
-  deleteUser(userIds: Array<string>): Observable<any> {
-    const options = {
-      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-      body: { userIds }
-    };
-    return this.http.delete(`${this.apiUrl}/users`, options);
+  public deleteUser(userIds: Array<string>) {
+    return this.http.post('/User/deleteUser', {userIds});
   }
 
   /**
    * 重置用户密码
    */
-  resetUserPassword(userId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users/reset-password`, { userId });
+  public resetUserPassword(userId: string) {
+    return this.http.post('/User/resetPwd', {userId: userId});
   }
 
-  /** 修改用户信息 */
-  updateUserInfo(params: UserInfo): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/${params.userId}`, params);
+  /** 修改用户信息*/
+  public updateUserInfo(params: userInfo) {
+    return this.http.post('/User/updateUserInfo', params);
   }
 
   /**
    * 增加用户
    */
-  addUser(params: UserInfo): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users`, params);
+  public addUser(params: userInfo) {
+    return this.http.post('/User/addUser', params);
   }
 
   /**
    * 获取用户类型
    */
-  getUserType(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/types`);
+  public getUserType() {
+    return this.http.post('/User/userType');
   }
 
   /**
    * 邮箱和手机注册
    * @param params
    */
-  register(params: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users/register`, params);
+  public register(params:any) {
+    return this.http.post('/User/register', params);
   }
 
-  registerInfor(params: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users/register-info`, params);
+  public registerInfor(params:any) {
+    return this.http.post('/User/perfectInfo', params);
   }
 
-  login(params: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users/login`, params);
+  public login(params:any) {
+    return this.http.post('/User/login', params);
   }
 
-  bindWeChat(params: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users/bind-wechat`, params);
+  public bindWeChat(params: any) {
+    return this.http.post('/User/bindWeChat', params);
   }
 
-  bindWeChatToNewUser(params: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users/bind-wechat-new`, params);
+  public bindWeChatToNewUser(params: any) {
+    return this.http.post('/User/bindWeChatToNewUser', params);
   }
 
-  checkMobile(params: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/users/check-mobile`, params);
+  public checkMobile(params: any) {
+    return this.http.post('/User/checkMobile', params);
   }
 
-  update(params: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/users/update`, params);
+  update(params: any) {
+    return this.http.post('/User/update', params);
   }
 
-  readSimplify(keyword: string): Observable<any> {
-    const params = new HttpParams().set('keyword', keyword);
-    return this.http.get(`${this.apiUrl}/users/simplify`, { params });
+  readSimplify(keyword: string) {
+    return this.http.post('/Company/readSimplify', {keyword});
   }
 }
+

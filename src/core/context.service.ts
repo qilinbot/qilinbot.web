@@ -5,7 +5,31 @@ import {StringU} from "./utils/StringUtil";
 import {AppEnv, CompanyLogo, IUserInfo, RouteData} from "./const/context.var";
 // import {EventBusService} from "./event-bus/eventBus.service";
 import {HttpService} from "./http.service";
-import {interval} from "rxjs";
+import {interval, Subject} from "rxjs";
+import {UserPrivileges} from "./utils/page.enum";
+
+export interface IPage {
+  // getAppMobile(): AppMobile;
+
+  getName(): string;
+
+  getTitle(): string;
+
+  getUrl(): string;
+
+  getKeyword(): string;
+
+  getDescription(): string;
+
+  getParams(): Object;
+
+  postAppMobile(obj: any):any;
+
+  navigateDone():any;
+
+  navigateClose():any;
+}
+
 
 @Injectable({providedIn: 'root'})
 export class ContextService {
@@ -23,7 +47,9 @@ export class ContextService {
     return Date.now();
   }
 
-  public pages: any = {};
+  public route$=new Subject<string>();
+  public userPrivileges = new UserPrivileges();
+  public pages: Array<IPage> = []
   public deviceWidth!: number;
   public deviceHeight!: number;
   public now: number = Date.now();

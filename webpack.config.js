@@ -1,7 +1,7 @@
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 
-// todo 字体文件的打包存在未加载 目前通过link引入
 module.exports = {
   entry: {
     main: './src/main.ts',
@@ -15,12 +15,25 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
-        use: ['style-loader', {
-          loader: 'css-loader',
-          options: {
-            url: true,
-          }
-        }],
+        exclude: /node_modules/, // 排除 node_modules 文件夹中的 CSS 文件
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              url: true,
+            }
+          },
+          'postcss-loader', // 仅处理项目内的 CSS 文件
+        ],
+      },
+      {
+        test: /\.css$/,
+        include: /node_modules/, // 处理 node_modules 中的 CSS 文件
+        use: [
+          MiniCssExtractPlugin.loader, // 提取 CSS 到单独的文件
+          'css-loader',
+        ],
       },
       {
         test: /\.ttf$/,
@@ -44,6 +57,9 @@ module.exports = {
   plugins: [
     new MonacoWebpackPlugin({
       languages: ['javascript', 'typescript'],
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
     }),
   ],
   optimization: {

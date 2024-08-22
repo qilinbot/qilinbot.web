@@ -1,17 +1,29 @@
-import {APP_INITIALIZER, ApplicationConfig, inject, provideZoneChangeDetection} from '@angular/core';
+import {
+  APP_INITIALIZER,
+  ApplicationConfig,
+  Inject,
+  inject,
+  Injectable, InjectionToken,
+  provideZoneChangeDetection
+} from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
 
-import { routes } from './app.routes';
+import {AuthWebGuard1, LoginWebGuard1, routes, UserService1} from './app.routes';
 import {AppContext, AppEnv, RouteData} from "../core/const/context.var";
 import {ContextService} from "../core/context.service";
 import {EnvironmentService} from "../core/environment.service";
 import {Environment} from "../environments/environment";
 import {AppConfig} from "../core/const/environment.var";
 import { provideHttpClient} from "@angular/common/http";
+import {AuthWebGuard} from "../Guard/auth.web.guard";
+import {LoginWebGuard} from "../Guard/login.web.guard";
+import {UserService} from "../services/user.service";
+
 
 export function initializeApp() {
   let ctx = inject(AppContext);
   let env = inject(AppEnv);
+  console.log(env)
   return () => new Promise<any>(resolve => {
     env.initDevice();
     // ctx.init();
@@ -31,7 +43,6 @@ export function initializeApp() {
   });
 }
 
-// 现在都是采用方法注册进来
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -40,7 +51,13 @@ export const appConfig: ApplicationConfig = {
     { provide: AppContext, useClass: ContextService },
     { provide: AppEnv, useClass: EnvironmentService },
     { provide: RouteData, useValue: ActivatedRoute },
-    provideHttpClient(), // 注册 HttpClient
+    {provide: UserService1, useClass: UserService},
+    {provide: AuthWebGuard1, useClass: AuthWebGuard},
+    {provide: LoginWebGuard1, useClass: LoginWebGuard},
+    // UserService,
+    // AuthWebGuard,
+    // LoginWebGuard,
+    provideHttpClient(),
     {
       provide: APP_INITIALIZER,
       useFactory: initializeApp,
