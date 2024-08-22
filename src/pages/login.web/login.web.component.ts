@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject} from '@angular/core';
+import {ChangeDetectorRef, Component, Inject, OnInit} from '@angular/core';
 import {UserService} from "../../services/user.service";
 import {ContextService} from "../../core/context.service";
 import {AppContext} from "../../core/const/context.var";
@@ -28,7 +28,7 @@ export enum AuthCardStatus {
   templateUrl: './login.web.component.html',
   styleUrl: './login.web.component.scss'
 })
-export class LoginWebComponent {
+export class LoginWebComponent implements OnInit{
   public loginType:AuthCardStatus;
 
   username:string="";//账号
@@ -52,9 +52,11 @@ export class LoginWebComponent {
     protected route: ActivatedRoute,
     protected cdr: ChangeDetectorRef,
   ) { }
+  ngOnInit(){
+    this.initSocket();
+  }
 
   login(){
-    console.log("login")
     let oReq: any;
 
     console.log(this.loginType);
@@ -151,6 +153,7 @@ export class LoginWebComponent {
     });
     this.socket.onMessage((event: MessageEvent) => {
       let oData: any = JSON.parse(event.data);
+      console.log('onMessage', oData);
       if (!oData.isSuccess) {
         this.render.error(oData.message);
         return;
