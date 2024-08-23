@@ -7,8 +7,6 @@ import {
   provideZoneChangeDetection
 } from '@angular/core';
 import {ActivatedRoute, provideRouter} from '@angular/router';
-
-import {AuthWebGuard1, LoginWebGuard1, routes, UserService1} from './app.routes';
 import {AppContext, AppEnv, RouteData} from "../core/const/context.var";
 import {ContextService} from "../core/context.service";
 import {EnvironmentService} from "../core/environment.service";
@@ -18,6 +16,7 @@ import { provideHttpClient} from "@angular/common/http";
 import {AuthWebGuard} from "../Guard/auth.web.guard";
 import {LoginWebGuard} from "../Guard/login.web.guard";
 import {UserService} from "../services/user.service";
+import {routes} from "./app.routes";
 
 
 export function initializeApp() {
@@ -43,7 +42,7 @@ export function initializeApp() {
   });
 }
 
-export const appConfig: ApplicationConfig = {
+export const appConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
@@ -51,12 +50,9 @@ export const appConfig: ApplicationConfig = {
     { provide: AppContext, useClass: ContextService },
     { provide: AppEnv, useClass: EnvironmentService },
     { provide: RouteData, useValue: ActivatedRoute },
-    {provide: UserService1, useClass: UserService},
-    {provide: AuthWebGuard1, useClass: AuthWebGuard},
-    {provide: LoginWebGuard1, useClass: LoginWebGuard},
-    // UserService,
-    // AuthWebGuard,
-    // LoginWebGuard,
+    UserService,
+    AuthWebGuard,
+    LoginWebGuard,
     provideHttpClient(),
     {
       provide: APP_INITIALIZER,

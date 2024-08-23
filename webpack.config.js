@@ -17,7 +17,7 @@ module.exports = {
         test: /\.css$/,
         exclude: /node_modules/, // 排除 node_modules 文件夹中的 CSS 文件
         use: [
-          'style-loader',
+          MiniCssExtractPlugin.loader, // 提取 CSS 到单独的文件
           {
             loader: 'css-loader',
             options: {
@@ -33,10 +33,11 @@ module.exports = {
         use: [
           MiniCssExtractPlugin.loader, // 提取 CSS 到单独的文件
           'css-loader',
+          'postcss-loader', // 仅处理项目内的 CSS 文件
         ],
       },
       {
-        test: /\.ttf$/,
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
         include: [
           path.resolve(__dirname, 'src'),  // 项目源代码路径
           path.resolve(__dirname, 'node_modules/monaco-editor') // monaco-editor 路径

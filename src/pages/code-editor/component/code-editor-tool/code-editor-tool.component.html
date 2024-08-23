@@ -1,0 +1,48 @@
+<div class="merkaba-tool-wrapper">
+  <div class="tool-menu">
+    <ng-container *ngFor="let tool of tools;let index = index">
+      <span (click)="changeToolStatus(tool, index)" [ngClass]="{ 'active': tool.isActive }">
+        <i class="XPA" [ngClass]="tool.icon"></i>
+      </span>
+    </ng-container>
+  </div>
+  <div class="tool-content">
+    <as-split
+      gutterSize="5"
+      direction="vertical">
+      <as-split-area [size]="70" [tabIndex]=1 *ngIf="tools[0].isActive">
+        <div class="tool-content-title btns">
+          文件夹
+          <span class="block-btns" (click)="$event.stopPropagation()">
+            <i (click)="addFile()" class="XPA xpa-tianjia"></i>
+            <i (click)="editFile()" class="XPA xpa-xiugaimima"></i>
+            <i (click)="removeFile()" class="XPA xpa-shanchu"></i>
+          </span>
+        </div>
+        <div class="tool-content-item">
+<!--          <file-area #fileArea (selectChange)="selectChange($event)" ></file-area>-->
+        </div>
+      </as-split-area>
+      <as-split-area [size]="30" [tabIndex]="2" *ngIf="tools[1].isActive">
+        <div style="padding-top: 0" class="tool-content-title">
+          脚本配置
+        </div>
+        <div class="tool-content-item">
+<!--          <script-setting></script-setting>-->
+        </div>
+      </as-split-area>
+      <as-split-area [size]="30" [tabIndex]="3" *ngIf="tools[2].isActive">
+        <div style="padding-top: 0" class="tool-content-title">
+          大纲
+        </div>
+        <div class="tool-content-item">
+
+<!--          <code-outline></code-outline>-->
+        </div>
+      </as-split-area>
+    </as-split>
+  </div>
+</div>
+
+
+<!-- 脚本的配置应该单独建立一个table -->

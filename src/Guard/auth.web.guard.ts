@@ -3,12 +3,12 @@ import {Inject, Injectable} from '@angular/core';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 import {forkJoin, ObservableInput} from 'rxjs';
 import {AppContext} from "../core/const/context.var";
+import {RenderService} from "../core/render.service";
 import {ContextService} from "../core/context.service";
 
 @Injectable()
 export class AuthWebGuard  {
   constructor(@Inject(AppContext) public ctx: ContextService,
-              // @Inject(AppRender) public render: RenderService,
               public router: Router,
               protected http: HttpClient) {
   }
@@ -28,48 +28,27 @@ export class AuthWebGuard  {
   public authPermissionPromise(next: ActivatedRouteSnapshot):Promise<boolean>{
     let queues:Record<string, ObservableInput<any>> = {};
     if (this.ctx.isVisitor) {
-      console.log("游客")
-        console.log('============ctx===============')
-        console.log(this.ctx)
-
       queues["auth"]=this.httpUserAuth();
-      console.log(this.httpUserAuth())
-      this.httpUserAuth().subscribe(res=>{
-        console.log(res)
-      })
     }
 
-    console.log(this.httpUserAuth())
-    this.httpUserAuth().subscribe(res=>{
-      console.log(res)
-    })
-
-    // if(this.noPermissionMobile.includes(this.ctx.userInfo.mobile) && next.routeConfig.path) {
-    //   console.log('------------非法访问------------')
-    //   this.ctx.navigateUri('/', {});
-    //   return new Promise<boolean>((resolve) => {resolve(false)})
-    // }
-    // console.log('------------访问------------')
     let permissionName="permissions";
     if (next.data[permissionName]) {
       console.log("权限验证")
       queues[permissionName]=this.ctx.env.authPermissions(next.data[permissionName]);
     }
-    // if (Object.keys(queues).length==0){
-    //   return this.promiseOf(true);
-    // }
+    if (Object.keys(queues).length==0){
+      return this.promiseOf(true);
+    }
     return new Promise<boolean>((resolve, reject) => {
-      console.log(queues)
       forkJoin(queues).subscribe((result: any) => {
-        console.log(this.ctx)
         if (this.ctx.isVisitor){
           let respAuth: any = result["auth"];
           if (!this.handleAuth(resolve,respAuth)){
             if (this.ctx.env.appType == 'xpa') {
-              console.log("xpa登录")
+              // console.log("xpa登录")
               this.ctx.navigateUri('/login', {});
             } else {
-              console.log("非xpa")
+              // console.log("非xpa")
               this.ctx.navigateUri('/', {});
             }
             return;

@@ -5,7 +5,6 @@ import {AppContext} from "../../core/const/context.var";
 import {ActivatedRoute} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {NzButtonComponent} from "ng-zorro-antd/button";
-import {UserService1} from "../../app/app.routes";
 import {RenderService} from "../../core/render.service";
 import {ScoketClient} from "../../core/net/socketclient";
 export enum AuthCardStatus {
@@ -45,7 +44,7 @@ export class LoginWebComponent implements OnInit{
 
   public socket: ScoketClient;
   constructor(
-    @Inject(UserService1)  public userService: UserService,
+    public userService: UserService,
     // public userService: UserService,
     @Inject(AppContext) public ctx: ContextService,
     protected render: RenderService,
@@ -53,13 +52,30 @@ export class LoginWebComponent implements OnInit{
     protected cdr: ChangeDetectorRef,
   ) { }
   ngOnInit(){
-    this.initSocket();
+    let userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    console.log(userInfo);
+    // if(userInfo) {
+    //   this.username = userInfo.userName;
+    //   this.password = userInfo.password;
+    // }
+    //如果是首页跳转
+    this.route.queryParamMap.subscribe(res=>{
+      console.log(res)
+      if(res.get("state")=="register"){
+        this.loginType=AuthCardStatus.REGISTER;
+      }else{
+        this.loginType=AuthCardStatus.LOGIN;
+      }
+    })
+
+    setTimeout(() => {
+      this.initSocket();
+    }, 100);
   }
 
   login(){
     let oReq: any;
 
-    console.log(this.loginType);
     switch (this.loginType) {
       case AuthCardStatus.REGISTER:
         let params={};

@@ -1,0 +1,24 @@
+<i class="XPA xpa-window-restore"></i>
+<div class="automated" (click)="handleClick($event)">
+  <as-split style="width: 100%" unit="pixel" [gutterSize]="2">
+    <as-split-area [size]="330" [minSize]="50">
+      <div class="automated-left">
+<!--        <merkaba-tool></merkaba-tool>-->
+        <app-code-editor-tool></app-code-editor-tool>
+      </div>
+    </as-split-area>
+    <as-split-area>
+      <div class="automated-content">
+        <!--脚本区-->
+<!--        <merkaba-scripts></merkaba-scripts>-->
+        <!--日志区-->
+<!--        <div class="log">-->
+<!--          <div class="drag" (contextmenu)="false" (dblclick)="logDbClick($event)" (mousedown)="setHeight($event)"><span class="drag-line"><i></i><i></i></span></div>-->
+<!--&lt;!&ndash;          <running-log #runningLog (isShowLogChange)="logShow($event)" (scriptStop)="getStopInfo($event)" ></running-log>&ndash;&gt;-->
+<!--        </div>-->
+      </div>
+    </as-split-area>
+  </as-split>
+</div>
+
+

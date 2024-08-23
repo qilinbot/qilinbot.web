@@ -18,6 +18,7 @@ export class ScriptEditorComponent implements AfterViewInit {
   decorationMap: Map<number, string[]> = new Map<number, string[]>();
 
   ngAfterViewInit() {
+    console.log(1111);
     const jsCode = `"use strict";
 function Person(age) {
   if (age) {
