@@ -1,6 +1,6 @@
 import {
   APP_INITIALIZER,
-  ApplicationConfig,
+  ApplicationConfig, importProvidersFrom,
   Inject,
   inject,
   Injectable, InjectionToken,
@@ -17,6 +17,7 @@ import {AuthWebGuard} from "../Guard/auth.web.guard";
 import {LoginWebGuard} from "../Guard/login.web.guard";
 import {UserService} from "../services/user.service";
 import {routes} from "./app.routes";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 
 export function initializeApp() {
@@ -44,6 +45,7 @@ export function initializeApp() {
 
 export const appConfig = {
   providers: [
+    importProvidersFrom([BrowserAnimationsModule]),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     { provide: AppConfig, useValue: Environment },

@@ -1,0 +1,110 @@
+@import "src/assets/iconfont/iconfont.css";
+@import "node_modules/ng-zorro-antd/ng-zorro-antd.min.css";
+.merkaba-tool-wrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  //::ng-deep .ant-collapse-header {
+  //  background-color: var(--theme-tool-header);
+  //  color: var(--theme-minor-text-color)
+  //}
+  .tool-menu {
+    width: 76px;
+    min-width: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    img{
+      width: 48px;
+      margin-top: 20px;
+    }
+    .fengexian{
+      width: 52px;
+      height: 1px;
+      border: solid 1px #333333;
+      margin-top: 21px;
+      margin-bottom: 24px;
+    }
+    //padding: ;
+    span {
+      width: 52px;
+      height: 40px;
+      margin: 5px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:hover, &.active {
+        background-color: var(--merkaba-menu-hover-color);
+        border-radius: 5px;
+      }
+    }
+  }
+  .tool-content {
+    flex: 1;
+    width: calc(100% - 76px);
+    border-left: 1px solid var(--theme-border-color);
+    height: 100%;
+    //overflow-y: scroll;
+    //display: flex;
+    ::ng-deep .as-split-gutter {
+      border-top: 1px solid var(--theme-border-color);
+      background-color: var(--theme-tool-header) !important;
+    }
+    ::ng-deep .as-split-area {
+      display: flex;
+      flex-direction: column;
+    }
+    .tool-content-title {
+      &.btns {
+        display: flex;
+        justify-content: space-between;
+      }
+      background-color: var(--theme-tool-header);
+      color: var(--theme-minor-text-color);
+      font-size: 16px;
+      padding: 5px 10px;
+    }
+    .tool-content-item {
+      flex: 1;
+      height:100px; //不能删除 运行原理还不知道
+      .folder-info{
+        display: flex;
+        flex-direction: row;
+      }
+      .folder-tools {
+        font-size: 28px;
+        display: flex;
+        flex-direction: row;
+        margin-left: 10px;
+        align-items: center;
+        gap: 24px;
+      }
+    }
+    .block-btns {
+      color: var(--theme-header-text-color);
+      i.XPA {
+        &:hover {
+          color: var(--theme-header-hover-color);
+        }
+        margin-left: 10px;
+      }
+    }
+    ::ng-deep .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+      height: 35px;
+      display: flex;
+      align-items: center;
+      padding: 2px 6px;
+    }
+    ::ng-deep .ant-collapse-content > .ant-collapse-content-box {
+      padding: 0;
+    }
+    //  树
+    ::ng-deep .dx-treelist-container.dx-gridbase-container {
+      background-color:var(--theme-background-color);
+    }
+  }
+  ::ng-deep .ant-collapse {
+    border: none;
+  }
+}
+

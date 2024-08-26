@@ -1,8 +1,10 @@
-import {Component, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, NgZone} from '@angular/core';
 import {SplitAreaComponent, SplitComponent} from "angular-split";
 import {ITool, tools} from "./tools.const";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {CodeEditorService} from "../../../../services/code-editor.service";
+import {NzTreeViewModule} from "ng-zorro-antd/tree-view";
+import {FileFolderComponent} from "./component/file-folder/file-folder.component";
 
 @Component({
   selector: 'app-code-editor-tool',
@@ -13,19 +15,23 @@ import {CodeEditorService} from "../../../../services/code-editor.service";
     NgForOf,
     SplitComponent,
     NgIf,
+    NzTreeViewModule,
+    FileFolderComponent,
   ],
   templateUrl: './code-editor-tool.component.html',
   styleUrl: './code-editor-tool.component.scss'
 })
-export class CodeEditorToolComponent {
+export class CodeEditorToolComponent implements AfterViewInit{
   protected readonly tools = tools;
-  // todo 文件夹区域组件
+  showTool = false;
   // @ViewChild( 'fileArea' ) fileArea: FileAreaComponent
   // 上一次选中的工具下标
   lastActiveToolIndex: number = 0
 
   constructor(
     public service: CodeEditorService,
+    private cdr: ChangeDetectorRef,
+
   ) {
     this.service.windowChannel.subscribe( res => {
       if(res.name != "tool") return
@@ -46,12 +52,10 @@ export class CodeEditorToolComponent {
     this.changeToolStatus( this.tools[0], 0 )
   }
 
-  selectChange(e) {
-    // console.log(e)
-  }
-
   changeToolStatus(tool: ITool, index: number) {
     tool.isActive = !tool.isActive
+    this.showTool = this.tools.some( item => item.isActive )
+    console.log(this.showTool)
     if(!tool.isActive) {
       const index = this.tools.findIndex( item => item.isActive )
       if(index > -1) return

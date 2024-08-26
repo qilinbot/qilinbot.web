@@ -1,0 +1,9 @@
+<nz-tabset
+  [(nzSelectedIndex)]="selectedIndex"
+  (nzAdd)="newTab()"
+  (nzClose)="closeTab($event)"
+>
+  @for (tab of tabs; track tab) {
+    <nz-tab nzClosable [nzTitle]="tab">Content of {{ tab }}</nz-tab>
+  }
+</nz-tabset>
