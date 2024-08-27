@@ -76,9 +76,10 @@
               }
             ],
             "styles": [
-              "node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
+              "node_modules/ng-zorro-antd/ng-zorro-antd.css",
               "src/assets/iconfont/iconfont.css",
-              "src/styles.scss"
+              "src/styles.scss",
+              "node_modules/ng-devui/devui.css"
             ],
             "scripts": []
           },

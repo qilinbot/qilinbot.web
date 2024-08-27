@@ -1,0 +1,12 @@
+@import "../../../../../../node_modules/ng-zorro-antd/ng-zorro-antd.min.css";
+@import "../../../../../assets/iconfont/iconfont.css";
+.folder-area{
+
+  nz-input-group {
+    margin-bottom: 8px;
+  }
+
+  ::ng-deep .highlight {
+    color: #f50;
+  }
+}

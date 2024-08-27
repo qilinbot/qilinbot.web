@@ -1,0 +1,14 @@
+@import "node_modules/ng-zorro-antd/ng-zorro-antd.min.css";
+.form{
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  .choice{
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    label{
+      width: 150px;
+    }
+  }
+}

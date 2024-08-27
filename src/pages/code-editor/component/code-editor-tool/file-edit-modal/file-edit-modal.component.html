@@ -1,0 +1,20 @@
+<div class="form">
+  <div class="choice">
+    <label for="type">选择文件类型：</label>
+    <nz-select id="type" nzShowSearch nzAllowClear nzPlaceHolder="选择创建的文件类型" [(ngModel)]="editRecord.type">
+      <nz-option nzLabel="文件夹" nzValue=1></nz-option>
+      <nz-option nzLabel="脚本文件" nzValue=2></nz-option>
+    </nz-select>
+  </div>
+  <div class="choice">
+    <label for="name">名称：</label>
+    <input id="name" nz-input placeholder="请输入名称" [(ngModel)]="editRecord.name" type="text" />
+  </div>
+
+  <div class="choice">
+    <label for="title">标题：</label>
+    <input id="title" nz-input placeholder="请输入标题" [(ngModel)]="editRecord.title" type="text" />
+  </div>
+</div>
+
+

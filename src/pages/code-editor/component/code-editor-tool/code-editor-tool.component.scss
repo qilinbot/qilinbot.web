@@ -40,7 +40,35 @@
     }
   }
   .tool-content {
+    border-right: dashed 1px #666666;
+    margin-top: 24px;
+
+    .folder-info{
+      display: flex;
+      flex-direction: row;
+      .folder-name{
+        font-size: 20px;
+        font-weight: bold;
+      }
+      .project-version{
+        text-align: center;
+        background-color: #D86A03;
+        width: 47px;
+        height: 24px;
+        line-height: 24px;
+        border-radius: 4px;
+        color: #ffffff;
+      }
+    }
+    .folder-tools{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+    }
     flex: 1;
+    display: flex;
+    gap: 24px;
     width: calc(100% - 76px);
     border-left: 1px solid var(--theme-border-color);
     height: 100%;

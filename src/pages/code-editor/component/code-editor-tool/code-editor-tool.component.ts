@@ -1,10 +1,16 @@
-import {AfterViewInit, ChangeDetectorRef, Component, NgZone} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, NgZone, ViewChild} from '@angular/core';
 import {SplitAreaComponent, SplitComponent} from "angular-split";
 import {ITool, tools} from "./tools.const";
 import {NgClass, NgForOf, NgIf} from "@angular/common";
 import {CodeEditorService} from "../../../../services/code-editor.service";
 import {NzTreeViewModule} from "ng-zorro-antd/tree-view";
-import {FileFolderComponent} from "./component/file-folder/file-folder.component";
+import {FileFolderComponent} from "./file-folder/file-folder.component";
+import {NzButtonComponent} from "ng-zorro-antd/button";
+import {NzDrawerComponent} from "ng-zorro-antd/drawer";
+import {NzIconDirective} from "ng-zorro-antd/icon";
+import {NzInputDirective, NzInputGroupComponent} from "ng-zorro-antd/input";
+import {DialogService} from "ng-devui";
+import {FileEditModalComponent} from "./file-edit-modal/file-edit-modal.component";
 
 @Component({
   selector: 'app-code-editor-tool',
@@ -17,20 +23,27 @@ import {FileFolderComponent} from "./component/file-folder/file-folder.component
     NgIf,
     NzTreeViewModule,
     FileFolderComponent,
+    NzButtonComponent,
+    NzDrawerComponent,
+    NzIconDirective,
+    NzInputDirective,
+    NzInputGroupComponent,
   ],
   templateUrl: './code-editor-tool.component.html',
   styleUrl: './code-editor-tool.component.scss'
 })
 export class CodeEditorToolComponent implements AfterViewInit{
+  public addFileDrawerVisible: boolean = false;
   protected readonly tools = tools;
   showTool = false;
-  // @ViewChild( 'fileArea' ) fileArea: FileAreaComponent
+  @ViewChild( 'fileFolder' ) fileFolder: FileFolderComponent
   // 上一次选中的工具下标
   lastActiveToolIndex: number = 0
 
   constructor(
     public service: CodeEditorService,
     private cdr: ChangeDetectorRef,
+
 
   ) {
     this.service.windowChannel.subscribe( res => {
@@ -46,7 +59,42 @@ export class CodeEditorToolComponent implements AfterViewInit{
         this.service.windowChannel.next( { name: 'toolWidth', value: 330 } )
       }
     } );
+    console.log(this.addFileDrawerVisible);
   }
+
+
+  // beforeHidden(): Promise<boolean> {
+  //   return new Promise((resolve) => {
+  //     const results = this.dialogService.open({
+  //       id: 'dialog-service',
+  //       width: '300px',
+  //       maxHeight: '600px',
+  //       title: '',
+  //       content: 'Do you want to save the modification before closing the page?',
+  //       backdropCloseable: false,
+  //       dialogtype: 'warning',
+  //       buttons: [
+  //         {
+  //           cssClass: 'primary',
+  //           text: 'Save',
+  //           handler: ($event: Event) => {
+  //             results.modalInstance.hide();
+  //             resolve(true);
+  //           },
+  //         },
+  //         {
+  //           id: 'btn-cancel',
+  //           cssClass: 'common',
+  //           text: 'Cancel',
+  //           handler: ($event: Event) => {
+  //             results.modalInstance.hide();
+  //             resolve(true);
+  //           },
+  //         },
+  //       ],
+  //     });
+  //   });
+  // }
 
   ngAfterViewInit() {
     this.changeToolStatus( this.tools[0], 0 )
@@ -69,7 +117,7 @@ export class CodeEditorToolComponent implements AfterViewInit{
   // todo 实现对文件区的操作
   addFile() {
     console.log('add file')
-    // this.fileArea.addFile()
+    this.fileFolder.addNewFile();
   }
 
   editFile() {
@@ -81,4 +129,5 @@ export class CodeEditorToolComponent implements AfterViewInit{
     console.log('remove file')
     // this.fileArea.removeFile()
   }
+
 }

@@ -1,2 +1,9 @@
-@import "src/assets/iconfont/iconfont.css";
 @import "node_modules/ng-zorro-antd/ng-zorro-antd.min.css";
+@import "src/assets/iconfont/iconfont.css";
+.editor-body{
+  ::ng-deep d-tab {
+    width: 168px;
+    height: 64px;
+  }
+
+}

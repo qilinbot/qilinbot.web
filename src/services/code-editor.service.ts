@@ -108,6 +108,14 @@ export interface MerkabaNodeData{
   // idleCount:number,
   maxCount:number,
 }
+
+/**
+ * todo 断点信息接口
+ */
+export interface BreakPoint{
+  line:number,
+
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -119,6 +127,7 @@ export class CodeEditorService {
   // 脚本窗口的事件分发
   windowChannel: Subject<IScriptWindowEvent> = new Subject<IScriptWindowEvent>()
   // 维护断点信息
+  breakpoint: Array<BreakPoint> = [];
 
 
   constructor(private http: HttpService) {}
