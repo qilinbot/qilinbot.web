@@ -1,6 +1,6 @@
 <div class="merkaba-tool-wrapper">
   <div class="tool-menu">
-    <img src="/assets/qilin-logo.jpg" alt="qilin-logo" height="48" width="48">
+    <img src="../../../assets/qilin-logo.jpg" alt="qilin-logo" height="48" width="48">
     <div class="fengexian"></div>
     <ng-container *ngFor="let tool of tools;let index = index">
       <span (click)="changeToolStatus(tool, index)" [ngClass]="{ 'active': tool.isActive }">
@@ -14,24 +14,26 @@
       direction="vertical"
     >
       <as-split-area [size]="100" *ngIf="tools[0].isActive">
-        <div class="folder-info">
-          <div class="folder-name" >亚马逊商品波动动分析
-            <!--      <span nz-icon nzType="play-circle" nzTheme="outline"></span>-->
+        <div class="tool-content-title">
+          <div class="folder-info">
+            <div class="folder-name" >亚马逊商品波动动分析
+              <!--      <span nz-icon nzType="play-circle" nzTheme="outline"></span>-->
+            </div>
+            <div class="project-version">V2.00 </div>
           </div>
-          <div class="project-version">V2.00 </div>
+          <div class="folder-tools">
+            <nz-input-group [nzSuffix]="suffixIconSearch" style="width: 236px">
+              <input type="text" nz-input placeholder="输入名称" />
+            </nz-input-group>
+            <ng-template #suffixIconSearch>
+              <span nz-icon nzType="search"></span>
+            </ng-template>
+            <i class="XPA xpa-shanchu1" (click)="removeFile()" ></i>
+            <i class="XPA xpa-xiazai" (click)="downloadFile()"></i>
+            <i class="XPA xpa-a-xinzeng1" (click)="addFile()"></i>
+          </div>
+          <app-file-folder #fileFolder style="height: 100%; overflow-y: scroll"></app-file-folder>
         </div>
-        <div class="folder-tools">
-          <nz-input-group [nzSuffix]="suffixIconSearch" style="width: 236px">
-            <input type="text" nz-input placeholder="输入名称" />
-          </nz-input-group>
-          <ng-template #suffixIconSearch>
-            <span nz-icon nzType="search"></span>
-          </ng-template>
-          <i class="XPA xpa-shanchu1" ></i>
-          <i class="XPA xpa-xiazai"></i>
-          <i class="XPA xpa-a-xinzeng1" (click)="addFile()"></i>
-        </div>
-        <app-file-folder #fileFolder></app-file-folder>
       </as-split-area>
       <as-split-area [size]="30"  *ngIf="tools[1].isActive">
         <div style="padding-top: 0" class="tool-content-title">

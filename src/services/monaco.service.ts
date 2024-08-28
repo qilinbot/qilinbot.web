@@ -1,15 +1,16 @@
 import { Injectable, NgZone} from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import {editor, languages} from "monaco-editor";
 import {CodeDeclareService} from "./code-declare.service";
 import {IScriptOutLine} from "./code-editor.service";
 import {MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
 import {editorThemeConfig, language} from "../pages/code-editor/const/merkaba.editor.language";
+import * as monaco from 'monaco-editor';
 @Injectable({
   providedIn: 'root'
 })
 export class MonacoService {
-  monaco
+  monaco = monaco;
 
   /**
    * 脚本内容的变化 todo 具体用来干什么的
@@ -73,7 +74,8 @@ export class MonacoService {
   public createEditor(script: MerkabaScript, element: any, content?:string) {
     let media = window.matchMedia('(prefers-color-scheme: dark)')
 
-    this.monaco = (window as any).monaco;
+    // this.monaco = (window as any).monaco;
+    console.log(this.monaco)
     this.initCustomerKey()
     this.setEditorColor(this.monaco.editor, media.matches)
     // 检测颜色切换主题
@@ -82,23 +84,20 @@ export class MonacoService {
     } else if (typeof media.addListener === 'function') {
       media.addListener(() => { this.setEditorColor( this.monaco.editor, media.matches ) });
     }
-    const editor: editor.IStandaloneCodeEditor= this.monaco.editor.create(element, {
-      model: this.monaco.editor.createModel(content || script.content, 'typescript',),
+    const editor: editor.IStandaloneCodeEditor= monaco.editor.create(element, {
+      model: monaco.editor.createModel(content || script.content, 'typescript',),
       value: script.content,
       wordWrap: 'on',
       automaticLayout: true,
       contextmenu: true,
-      renderLineHighlight: false,
       autoClosingBrackets: 'beforeWhitespace',
       autoClosingQuotes: 'beforeWhitespace',
       smoothScrolling: true,
       readOnly: !script.editable,
       fontSize: 16,
       lineHeight: 30,
-      foldingStrategy: "brace",
       suggestFontSize: 16,
       theme: media.matches ? 'myCustom-theme-dark' :'myCustom-theme',
-      autoIndent: true,
       formatOnPaste: true,
       glyphMargin: true,
       minimap: {
@@ -290,6 +289,7 @@ export class MonacoService {
   }
 
   private initCustomerKey() {
+    console.log(this.monaco.languages)
     this.monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false, // 不启用语义验证
         noSyntaxValidation: false,   // 不启用语法验证
@@ -315,10 +315,11 @@ export class MonacoService {
     //   aliases: ['MyCustomLanguage', 'mycustomlanguage'],
     // })
 
-    this.monaco.languages.setMonarchTokensProvider('typescript', {
-      ...this.monaco.languages.typescript.typescriptDefaults,
-      ...language
-    })
+
+    // monaco.languages.setMonarchTokensProvider('typescript', {
+    //   ...this.monaco.languages.typescript.typescriptDefaults,
+    //   ...language
+    // })
 
     this.monaco.editor.defineTheme('myCustom-theme-dark', {
       base: 'vs-dark', // 选择一个基础主题

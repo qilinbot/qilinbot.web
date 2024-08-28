@@ -1,0 +1,63 @@
+<!-- todo 滚动条-->
+<nz-tree-view #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true">
+  <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
+    <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
+    <nz-tree-node-option
+      [nzDisabled]="node.disabled"
+      [nzSelected]="selectListSelection.isSelected(node)"
+      (nzClick)="selectListSelection.toggle(node)"
+      (dblclick)="toLoadScript(node)"
+    >
+      <!--   叶子结点   -->
+      <div class="list-noleaf">
+        <span nz-icon [nzType]="node.type === 2 ? 'file' : 'folder-open'" nzTheme="outline"></span>
+        <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
+      </div>
+    </nz-tree-node-option>
+  </nz-tree-node>
+
+  <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodePadding>
+    <nz-tree-node-toggle>
+      <span nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></span>
+    </nz-tree-node-toggle>
+    <nz-tree-node-option
+      [nzDisabled]="node.disabled"
+      [nzSelected]="selectListSelection.isSelected(node)"
+      (nzClick)="selectListSelection.toggle(node)"
+    >
+      <!--   非叶子结点 （肯定是文件夹）  -->
+      <div class="list-noleaf">
+        <span nz-icon [nzType]="treeControl.isExpanded(node) ? 'folder-open' : 'folder'" nzTheme="outline"></span>
+        <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
+      </div>
+    </nz-tree-node-option>
+  </nz-tree-node>
+</nz-tree-view>
+
+<ng-template #treeList let-node>
+  <div class="list-item">
+    <div class="list-item-left">
+      <!--      <i class="XPA" [ngClass]="iconType[node.type]"></i>-->
+      <span nz-tooltip [nzTooltipTitle]="node.title" class="site-name">{{ node.name }}</span>
+    </div>
+    <div class="list-item-right">
+      <i *ngIf="!node.editable" class="XPA xpa-lock lock"></i>
+      <p
+        *ngIf="node.type == 2"
+        nz-popconfirm
+        nzPopconfirmTitle="是否要发布？"
+        nzPopconfirmPlacement="top"
+        nzPopconfirmTrigger="hover"
+        (nzOnConfirm)="publishScript(node)"
+        class="list-version"
+        style="margin: 0;padding: 0">
+        <span class="dev-version">{{ node.devVersion }}</span>
+        <span class="prd-version">{{ node.prdVersion }}</span>
+      </p>
+    </div>
+  </div>
+</ng-template>
+
+
+
+

@@ -14,14 +14,14 @@ import {
   NzTreeNodeToggleRotateIconDirective, NzTreeView,
   NzTreeViewComponent, NzTreeViewModule,
 } from "ng-zorro-antd/tree-view";
-import { FlatTreeControl } from '@angular/cdk/tree';
+import {FlatTreeControl} from '@angular/cdk/tree';
 import {NzHighlightPipe} from "ng-zorro-antd/core/highlight";
 import {FormsModule} from "@angular/forms";
 import {NzNoAnimationDirective} from "ng-zorro-antd/core/no-animation";
 import {CommonModule} from "@angular/common";
 import {SelectionModel} from "@angular/cdk/collections";
-import {CodeEditorService} from "../../../../../services/code-editor.service";
-import {MerkabaRecord, MerkabaScript} from "../../../const/code-editor.page.const";
+import {CodeEditorService} from "../../../../services/code-editor.service";
+import {MerkabaRecord, MerkabaScript} from "../../const/code-editor.page.const";
 import {NzDrawerComponent, NzDrawerContentDirective} from "ng-zorro-antd/drawer";
 import {NzFormControlComponent, NzFormDirective, NzFormLabelComponent} from "ng-zorro-antd/form";
 import {NzColDirective, NzRowDirective} from "ng-zorro-antd/grid";
@@ -30,8 +30,15 @@ import {NzDatePickerComponent} from "ng-zorro-antd/date-picker";
 import {NzButtonComponent} from "ng-zorro-antd/button";
 import {DialogService} from "ng-devui";
 import {FileEditModalComponent} from "../file-edit-modal/file-edit-modal.component";
+import {RenderService} from "../../../../core/render.service";
+import {NzTooltipDirective} from "ng-zorro-antd/tooltip";
+import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
 
-
+export enum EIconType {
+  'xpa-wangzhan',
+  'xpa-wenjianjia',
+  'xpa-js'
+}
 interface FlatNode {
   id?: string;
   parentId?: string;
@@ -39,11 +46,11 @@ interface FlatNode {
   name?: string;
   title?: string;
   uri?: string;
-  seq?:number
-  devVersion?:number;
-  prdVersion?:number
-  parentRecord?:MerkabaRecord
-  children?:Array<MerkabaRecord>
+  seq?: number
+  devVersion?: number;
+  prdVersion?: number
+  parentRecord?: MerkabaRecord
+  children?: Array<MerkabaRecord>
 
   // 提供树形结构去使用
   expandable: boolean;
@@ -75,17 +82,22 @@ interface FlatNode {
     NzButtonComponent,
     NzDrawerContentDirective,
     NzSelectModule,
+    NzTooltipDirective,
+    NzPopconfirmDirective,
   ],
   templateUrl: './file-folder.component.html',
   styleUrl: './file-folder.component.scss',
 })
 export class FileFolderComponent {
+  iconType = EIconType;
+  private fileData: MerkabaRecord[] = [];
   @ViewChild("treeView", {static: false}) treeView!: NzTreeViewComponent<FlatNode>;
   // 扁平化
   private transformer = (node: MerkabaRecord, level: number): FlatNode => ({
     ...node,
     expandable: !!node.children && node.children.length > 0,
     name: node.name,
+    parentRecord: node.parentRecord,
     level,
     disabled: false,
   });
@@ -105,24 +117,31 @@ export class FileFolderComponent {
 
   dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-  constructor(private service: CodeEditorService,private dialogService: DialogService) {
+  constructor(private service: CodeEditorService, private dialogService: DialogService, private render: RenderService) {
     this.service.load({}).subscribe(resp => {
+      this.fileData = resp.items;
       this.dataSource.setData(resp.items);
     })
-    // this.dataSource.setData(TREE_DATA);
   }
 
   hasChild = (_: number, node: FlatNode): boolean => node.expandable;
 
+  /**
+   * 加载脚本编辑器
+   * @param e
+   */
+  toLoadScript(e){
+    this.service.scriptChannel.next({type: 'openScript', script: e})
+  }
 
   /**
    * 新建文件
    */
-  addNewFile(){
+  addNewFile() {
     const parseParentId = (node: FlatNode) => {
-      if(!node) return "";
-      else{
-        switch (node.type){
+      if (!node) return "";
+      else {
+        switch (node.type) {
           case 0:
           case 1:
             return node.id
@@ -132,7 +151,7 @@ export class FileFolderComponent {
       }
     }
     const getRecord = (node: FlatNode): MerkabaRecord => {
-      if(node){
+      if (node) {
         delete node.disabled;
         delete node.expandable;
         delete node.level;
@@ -147,16 +166,84 @@ export class FileFolderComponent {
     this.updateFile(newFile, false, 'add');
   }
 
-  editFile(){
-    let editRecord = this.selectListSelection.selected[0];
-    // todo bug
-    if(editRecord.parentId) {
-      editRecord.parentRecord = this.selectListSelection.selected[0].parentRecord;
+  /**
+   * 选中文件夹的内容删除文件
+   */
+  removeFile() {
+    const deleteRecord = this.selectListSelection.selected[0];
+    if (!deleteRecord) {
+      return; // 没有选择
     }
-    this.updateFile(editRecord, true, 'modify');
+
+    let result = this.render.confirm('确定要删除{' + deleteRecord.name + '}吗？');
+    if (result) {
+      this.service.remove(deleteRecord.id).subscribe(resp => {
+        this.removeNodeRecursively(this.fileData, deleteRecord.id);
+        this.dataSource.setData(this.fileData); // 更新视图
+      });
+    }
+  }
+  private removeNodeRecursively(nodes: MerkabaRecord[], nodeId: string): boolean {
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].id === nodeId) {
+        nodes.splice(i, 1);
+        return true;
+      }
+      if (nodes[i].children && this.removeNodeRecursively(nodes[i].children, nodeId)) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  updateFile(data: MerkabaRecord, isEdit: boolean = false, type: 'add' | 'modify'){
+
+  /**
+   * 修改文件的基本信息
+   */
+  editFile() {
+    let editRecord = this.selectListSelection.selected[0];
+
+    if (editRecord.parentId) {
+      editRecord.parentRecord = this.selectListSelection.selected[0].parentRecord;
+    }
+
+  }
+
+  /**
+   *下载脚本代码
+   */
+  downloadFile() {
+    // todo 下载功能放在这可能会选中文件夹
+    let downloadRecord = this.selectListSelection.selected[0];
+    this.service.readScript(downloadRecord.id).subscribe((resp: MerkabaScript) => {
+      const data = resp.content;
+      console.log(data);
+      const blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = resp.name + '-' + resp.version + ".js";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  /**
+   * todo 脚本新版本的发布
+   */
+  publishScript(node: FlatNode){
+
+  }
+
+  /**
+   * 弹窗新建/修改文件信息
+   * @param data
+   * @param isEdit
+   * @param type
+   */
+  updateFile(data: MerkabaRecord, isEdit: boolean = false, type: 'add' | 'modify') {
     const results = this.dialogService.open({
       id: 'dialog-service',
       width: '500px',
@@ -165,7 +252,6 @@ export class FileFolderComponent {
       content: FileEditModalComponent,
       dialogtype: 'standard',
       // beforeHidden: () => this.beforeHidden(),
-
       backdropCloseable: true,
       buttons: [
         {
@@ -179,12 +265,21 @@ export class FileFolderComponent {
           cssClass: 'primary',
           text: '保存',
           handler: ($event: Event) => {
-
-            const fileEditModalInstance =  results.modalContentInstance as FileEditModalComponent
-            // todo 弹窗中填写的数据未做校验
+            // todo handler 要根据传入的是编辑还是增加去分别操作 有修改操作再补
+            const fileEditModalInstance = results.modalContentInstance as FileEditModalComponent
             fileEditModalInstance.updateEditRecord().then(resp => {
-              // 网络更新完数据之后 拿到的数据
-              console.log(resp)
+              if(resp.isSuccess){
+                delete resp.isSuccess;
+                Object.assign(data, resp);
+                if (data.parentRecord) {
+                  data.parentRecord.children.push(data);
+                } else {
+                  this.fileData.push(data);
+                }
+                console.log(data)
+                this.dataSource.setData(this.fileData);
+                results.modalInstance.hide();
+              }
             })
           },
         },
@@ -192,19 +287,6 @@ export class FileFolderComponent {
     });
     const fileEditModalInstance = results.modalContentInstance as FileEditModalComponent;
     fileEditModalInstance.initData(data);
-  }
-
-  findFirstEmptyPropertyName(obj: Record<string, any>): string | null {
-    const emptyProperty = Object.entries(obj).find(([key, value]) =>
-      value === null ||
-      value === undefined ||
-      value === '' ||
-      value === 0 ||
-      Number.isNaN(value)
-    );
-
-    // 如果找到则返回属性名，否则返回 null
-    return emptyProperty ? emptyProperty[0] : null;
   }
 
 }
