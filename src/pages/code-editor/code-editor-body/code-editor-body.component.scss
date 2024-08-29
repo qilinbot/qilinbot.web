@@ -4,6 +4,14 @@
   width: 100%;
   height: 100%;
   position: relative;
+  ::ng-deep nz-tabset{
+    .ant-tabs-content{
+      height: 100%;
+    }
+    ::ng-deep nz-tab .code{
+      height: 100%;
+    }
+  }
   .merkaba-script-btns {
     position: absolute;
     height: 36px;

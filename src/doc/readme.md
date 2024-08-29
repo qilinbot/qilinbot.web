@@ -24,7 +24,6 @@
 - stopDebugging
 - restartDebugging
 
-
 ```ts
 export interface DebugInfo {
   variableInfos: Variable[];       // 当前的变量信息
@@ -46,15 +45,47 @@ export interface DebugInfo {
 
   
 ### 代码提示  
-一般的代码提示是通过 jsdoc去声明的
+
 支持这种： 
 ![img_2.png](img_2.png)
-在内部写的变量要能支持jsdoc
+解决上述函数形参中的代码提示
+1. 通过jsdoc注释获取函数的参数类型
+```ts
+// 提供额外的全局类型声明或定义类型
+monaco.languages.typescript.javascriptDefaults.addExtraLib(`
+/**
+ * @typedef {Object} Person
+ * @property {number} a
+ * @property {number} b
+ * @property {function(string): void} sayHi
+ */
+ class Person{
+  a: number;
+  b: number;
+  sayHi(name: string){
+    console.log(name)
+  }
+ }
+`, 'filename/fake.d.ts');
+
+// 然后在你写代码过程中 添加类型的参数配置
+/**
+ * @param {Person} a
+ */
+function hello(a){
+  a
+}
+```
+2. 采用TypeScript的类型声明
+```ts
+function hello(a: Person){
+    a.sayHi
+}
+```
 
 代码提示来源于
-1. 当前文件已经编写的已经常用库
+1. 当前代码文件中出现的关键字 abc 可以推断出来
 2. 自定义声明文件.d.ts 在代码中引入
-
 
 ### 大纲
 页面大纲根据如下结构渲染即可
@@ -204,8 +235,61 @@ export interface DebugInfo {
 - 引用的文件需要把声明注入到当前文件 提供悬浮提示、除代码报错等
 - 代码跳转跨文件跳转，跳转到声明的文件处（需要模块化的支持）
 
-这个需要保存每一个代码文件大纲结构，跳转的时候先找当前文件，然后走提供的`findSymbolDefinition`接口
+实现方案：
+1. monaco本身是支持模块化的 声明在模块化中文件是自动能够跳转的
+```ts
+// 创建多个文件模型
+const models = {
+  'file:///main.js': monaco.editor.createModel(`
+    import { sayHello } from './hello.js';
+    sayHello();
+  `, 'javascript', monaco.Uri.parse('file:///main.js')),
 
+  'file:///hello.js': monaco.editor.createModel(`
+    export function sayHello() {
+      console.log('Hello World');
+    }
+  `, 'javascript', monaco.Uri.parse('file:///hello.js'))
+};
+
+// 创建 Monaco 编辑器实例，使用其中一个模型
+const editor = monaco.editor.create(document.getElementById('container'), {
+  model: models['file:///main.js'],
+  language: 'javascript',
+  theme: 'vs-dark',
+  automaticLayout: true
+});
+
+## 配置 TypeScript 和 JavaScript 语言服务
+monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+  target: monaco.languages.typescript.ScriptTarget.ESNext,
+  module: monaco.languages.typescript.ModuleKind.ESNext,
+  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+  allowSyntheticDefaultImports: true,
+  allowJs: true,
+  checkJs: true
+});
+
+monaco.languages.typescript.javascriptDefaults.setEagerModelSync(true);
+
+// 监听鼠标的点击事件 动态的加载数据
+
+editor.onMouseDown((event) => {
+  const position = event.target.position;
+
+  if (position) {
+    editor.getAction('editor.action.goToDeclaration').run().then(() => {
+      const model = editor.getModel();
+      const uri = model.uri.toString();
+
+      // 如果跳转到的模型不在当前视图中，切换到该模型
+      if (models[uri] && model !== models[uri]) {
+        editor.setModel(models[uri]);
+      }
+    });
+  }
+});
+```
 ```ts
 export interface SymbolDefinition {
   name: string;          // 符号名称
@@ -218,7 +302,6 @@ export interface SymbolDefinition {
   module?: string;       // 符号所在的模块名称（如果项目有模块化的概念）
   isExported?: boolean;  // 是否导出（针对 TypeScript 等支持模块导出的语言）
 }
-
 
 export interface SymbolDefinitionResponse {
   file: string;           // 符号定义所在文件路径

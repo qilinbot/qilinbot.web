@@ -32,7 +32,9 @@
             <i class="XPA xpa-xiazai" (click)="downloadFile()"></i>
             <i class="XPA xpa-a-xinzeng1" (click)="addFile()"></i>
           </div>
-          <app-file-folder class="tool-content-item" #fileFolder style="height: 100%; overflow-y: scroll"></app-file-folder>
+        </div>
+        <div class="tool-content-item">
+          <app-file-folder class="tool-content-item" #fileFolder></app-file-folder>
         </div>
       </as-split-area>
       <as-split-area [size]="30"  *ngIf="tools[1].isActive">

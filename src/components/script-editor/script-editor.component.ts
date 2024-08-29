@@ -71,14 +71,14 @@ function onDragStart(e: any){
       }
     })
 
-    this.editor.onKeyDown((e) => {
-      if (e.keyCode === monaco.KeyCode.Enter) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('Enter key pressed');
-        this.insertImage('11', '//p5.img.cctvpic.com/photoworkspace/contentimg/2023/03/30/2023033011303020756.jpg');
-      }
-    });
+    // this.editor.onKeyDown((e) => {
+    //   if (e.keyCode === monaco.KeyCode.Enter) {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //     console.log('Enter key pressed');
+    //     this.insertImage('11', '//p5.img.cctvpic.com/photoworkspace/contentimg/2023/03/30/2023033011303020756.jpg');
+    //   }
+    // });
 
     // 监听粘贴事件
     // this.editor.onDidPaste((event:IPasteEvent) => {
