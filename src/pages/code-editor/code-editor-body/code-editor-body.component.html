@@ -8,14 +8,14 @@
     @for (tab of scriptTabs; track tab) {
       <nz-tab nzClosable [nzTitle]="tab.name">
         <div class="code" style="height: 100%; width: 100%">
-          <div class="editor" [ngClass]="'editor-' + tab.id" style="height: 1000px; width: 100%"></div>
+          <div class="editor" [ngClass]="'editor-' + tab.id" style="flex: 1; width: 100%"></div>
         </div>
       </nz-tab>
     }
   </nz-tabset>
 <!-- 编辑器的按钮  -->
   <div class="merkaba-script-btns">
-    <span (click)="changeEnabledVNC()" class="merkaba-script-btn-vnc" *ngIf="currentScript">
+    <span (click)="enabledVNC = !enabledVNC" class="merkaba-script-btn-vnc" *ngIf="currentScript">
 <!--      <em>vnc</em>-->
       <!--      <i class="XPA" [ngClass]="{ 'xpa-off': !enabledVNC, 'xpa-on': enabledVNC }" style="font-size: 14px;margin-left: 2px;"></i>-->
       <nz-switch [ngModel]="enabledVNC"
@@ -24,17 +24,17 @@
       ></nz-switch>
     </span>
 <!--  vnc 的选择  -->
-<!--    <span class="merkaba-script-btn-vnc">-->
-<!--      <i (click)="refreshNodes()" style="font-size: 16px;color: #1990ff;margin-right: 5px" class="XPA xpa-refresh"></i>-->
-<!--      <nz-cascader-->
-<!--        [nzShowInput]="false"-->
-<!--        [nzOptions]="nodes"-->
-<!--        [(ngModel)]="selectedNode"-->
-<!--        (ngModelChange)="onNodeChanged($event)"-->
-<!--      >-->
-<!--        <a href="javascript: void(0)"> {{ selectedNode?.length ? (selectedNode[1] | str:15) : '未选择节点' }}</a>-->
-<!--      </nz-cascader>-->
-<!--    </span>-->
+    <span class="merkaba-script-btn-vnc">
+      <i (click)="refreshNodes()" style="font-size: 16px;color: #1990ff;margin-right: 5px" class="XPA xpa-refresh"></i>
+      <nz-cascader
+        [nzShowInput]="false"
+        [nzOptions]="nodeGroup"
+        [(ngModel)]="selectedNode"
+        (ngModelChange)="onNodeChanged($event)"
+      >
+        <a href="javascript: void(0)"> {{ selectedNode?.length ? (selectedNode[1]) : '未选择节点' }}</a>
+      </nz-cascader>
+    </span>
     <div *ngIf="currentScript" class="merkaba-script-btn-vnc">
       <nz-select [(ngModel)]="prepareRunScriptId" nzBorderless>
         <nz-option *ngFor="let script of scripts"
@@ -65,15 +65,5 @@
         <i class="XPA xpa-debug-stop debug"></i>
       </button>
     </span>
-    <!--    <i class="XPA xpa-a-yunhangbeifen2"></i>-->
-<!--   todo 页面布局的变化  -->
-<!--    <span (click)="openWindow('tool')"  [ngClass]="{ 'active':this.btnState['tool'] }" class="merkaba-scripts-btn-window">-->
-<!--      <em class="sidebar"></em>-->
-<!--      <em></em>-->
-<!--    </span>-->
-<!--    <span (click)="openWindow('log')"  [ngClass]="{ 'active':this.btnState['log'] }"  class="merkaba-scripts-btn-window bottom">-->
-<!--      <em class="sidebar"></em>-->
-<!--      <em></em>-->
-<!--    </span>-->
   </div>
 </div>

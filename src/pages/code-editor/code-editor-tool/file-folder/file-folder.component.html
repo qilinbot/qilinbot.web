@@ -1,5 +1,4 @@
-<!-- todo 滚动条-->
-<nz-tree-view #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true">
+<nz-tree-view #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true" style="height: 100%; overflow-y: scroll">
   <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
     <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
     <nz-tree-node-option

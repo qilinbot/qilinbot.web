@@ -14,17 +14,21 @@ export interface MerkabaRecord {
   children?:Array<MerkabaRecord>
 }
 
+
+/**
+ * 结点的基本信息
+ */
 export interface MerkabaNode {
   // ip: string;
-  port: number;
-  platform: string,
-  taskCount: number,
-  tasks: Array<string>,
-  state: number,
-  uri: string,
-  title: string,
+  port: number;      // 端口
+  platform: string,  // 平台
+  taskCount: number,    // 任务数
+  tasks: Array<string>,  // 任务列表
+  state: number,       // 状态
+  uri: string,         // 脚本uri
+  title: string,        // 脚本名称
   // deviceId: string,
-  id:string
+  id:string           // 运行脚本机器的id
 }
 
 export interface MerkabaParameter {

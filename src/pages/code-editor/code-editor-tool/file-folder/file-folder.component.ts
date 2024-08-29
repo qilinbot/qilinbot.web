@@ -233,9 +233,34 @@ export class FileFolderComponent {
   /**
    * todo 脚本新版本的发布
    */
-  publishScript(node: FlatNode){
+  publishScript(node: FlatNode) {
+    this.service.publishScript(node.id).subscribe(resp => {
+      let record = this.selectListSelection.selected[0];
+      record.prdVersion = resp.version;
 
+      // 更新本地树节点数据
+      this.updateNodeVersion(this.fileData, node.id, resp.version);
+
+      // 重新设置数据源以刷新 TreeView
+      this.dataSource.setData(this.fileData);
+
+      this.render.success("发布成功");
+    });
   }
+
+// 更新本地树节点的版本号
+  updateNodeVersion(nodes: MerkabaRecord[], nodeId: string, newVersion: number) {
+    for (let node of nodes) {
+      if (node.id === nodeId) {
+        node.prdVersion = newVersion;
+        break;
+      }
+      if (node.children && node.children.length > 0) {
+        this.updateNodeVersion(node.children, nodeId, newVersion);
+      }
+    }
+  }
+
 
   /**
    * 弹窗新建/修改文件信息

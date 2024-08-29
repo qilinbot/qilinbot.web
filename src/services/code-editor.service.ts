@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import {Subject} from "rxjs";
-import {MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
+import {MerkabaNode, MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
 import {HttpService} from "../core/http.service";
+import {NzCascaderOption} from "ng-zorro-antd/cascader";
 
 
 /**
- * 任务的参数
+ * 任务的参数 todo 可拓展
  */
 interface IParameter{
   scriptUri:string,
@@ -41,7 +42,7 @@ interface IMerkabaTask{
 }
 
 /**
- * 选中字体的高亮高亮
+ * 选中字体的高亮
  */
 export interface IScriptOutLine {
   childItems?: Array<IScriptOutLine>,
@@ -126,9 +127,9 @@ export class CodeEditorService {
   scriptChannel: Subject<IScriptEvent> = new Subject<IScriptEvent>()
   // 脚本窗口的事件分发
   windowChannel: Subject<IScriptWindowEvent> = new Subject<IScriptWindowEvent>()
+
   // 维护断点信息
   breakpoint: Array<BreakPoint> = [];
-
 
   constructor(private http: HttpService) {}
 

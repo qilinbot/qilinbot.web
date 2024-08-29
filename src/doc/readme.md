@@ -1,4 +1,3 @@
-![img_1.png](img_1.png)
 ### 断点调试
 1. 在代码中设置断点
    保存打上的断点信息，然后带上断点信息给后端
@@ -13,7 +12,6 @@
 2. 代码的调试信息区
    - 变量信息 在调试过程中实时展示当前值  DebugVariableInfo
    - 监视区  在调试过程中你需要监控的    DebugVariableMonitor
-   - 堆栈信息  DebugStack
 
 辅助的Service
 - DebugWebSocketService：获取传输断点调试信息
@@ -47,7 +45,12 @@ export interface DebugInfo {
 ```
 
   
-### 代码提示
+### 代码提示  
+一般的代码提示是通过 jsdoc去声明的
+支持这种： 
+![img_2.png](img_2.png)
+在内部写的变量要能支持jsdoc
+
 代码提示来源于
 1. 当前文件已经编写的已经常用库
 2. 自定义声明文件.d.ts 在代码中引入

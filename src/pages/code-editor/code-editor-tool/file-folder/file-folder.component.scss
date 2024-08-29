@@ -5,7 +5,6 @@
   .list-noleaf{
     display: flex;
     width: 100%;
-
   }
 }
 
@@ -66,8 +65,4 @@
     overflow: hidden;
   }
 
-
-  > * {
-    user-select: none;
-  }
 }

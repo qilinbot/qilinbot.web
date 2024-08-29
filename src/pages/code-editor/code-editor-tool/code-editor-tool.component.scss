@@ -2,12 +2,8 @@
 @import "../../../../node_modules/ng-zorro-antd/ng-zorro-antd.min.css";
 .merkaba-tool-wrapper {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: flex;
-  //::ng-deep .ant-collapse-header {
-  //  background-color: var(--theme-tool-header);
-  //  color: var(--theme-minor-text-color)
-  //}
   .tool-menu {
     width: 76px;
     min-width: 76px;
@@ -66,7 +62,10 @@
       align-items: center;
       gap: 20px;
     }
-    flex: 1;
+
+    ::ng-deep app-file-folder{
+      flex: 1;
+    }
     display: flex;
     gap: 24px;
     width: calc(100% - 76px);
@@ -87,35 +86,10 @@
         display: flex;
         justify-content: space-between;
       }
-      background-color: var(--theme-tool-header);
+      //background-color: var(--theme-tool-header);
       color: var(--theme-minor-text-color);
       font-size: 16px;
       padding: 5px 10px;
-    }
-    .tool-content-item {
-      flex: 1;
-      height:100px; //不能删除 运行原理还不知道
-      .folder-info{
-        display: flex;
-        flex-direction: row;
-      }
-      .folder-tools {
-        font-size: 28px;
-        display: flex;
-        flex-direction: row;
-        margin-left: 10px;
-        align-items: center;
-        gap: 24px;
-      }
-    }
-    .block-btns {
-      color: var(--theme-header-text-color);
-      i.XPA {
-        &:hover {
-          color: var(--theme-header-hover-color);
-        }
-        margin-left: 10px;
-      }
     }
     ::ng-deep .ant-collapse > .ant-collapse-item > .ant-collapse-header {
       height: 35px;
@@ -125,10 +99,6 @@
     }
     ::ng-deep .ant-collapse-content > .ant-collapse-content-box {
       padding: 0;
-    }
-    //  树
-    ::ng-deep .dx-treelist-container.dx-gridbase-container {
-      background-color:var(--theme-background-color);
     }
   }
   ::ng-deep .ant-collapse {
