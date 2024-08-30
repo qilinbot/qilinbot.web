@@ -7,6 +7,9 @@
   ::ng-deep nz-tabset{
     .ant-tabs-content{
       height: 100%;
+      .ant-tabs-tabpane{
+        height: 100%;
+      }
     }
     ::ng-deep nz-tab .code{
       height: 100%;

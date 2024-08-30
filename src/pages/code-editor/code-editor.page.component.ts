@@ -3,6 +3,7 @@ import {SplitAreaComponent, SplitComponent} from "angular-split";
 import {CodeEditorToolComponent} from "./code-editor-tool/code-editor-tool.component";
 import {ScriptEditorComponent} from "../../components/script-editor/script-editor.component";
 import {CodeEditorBodyComponent} from "./code-editor-body/code-editor-body.component";
+import {CodeEditorLogComponent} from "./code-editor-log/code-editor-log.component";
 
 @Component({
   selector: 'app-code-editor.page',
@@ -12,7 +13,8 @@ import {CodeEditorBodyComponent} from "./code-editor-body/code-editor-body.compo
     SplitAreaComponent,
     CodeEditorToolComponent,
     ScriptEditorComponent,
-    CodeEditorBodyComponent
+    CodeEditorBodyComponent,
+    CodeEditorLogComponent
   ],
   templateUrl: './code-editor.page.component.html',
   styleUrl: './code-editor.page.component.scss'

@@ -11,7 +11,6 @@ import * as monaco from 'monaco-editor';
 })
 export class MonacoService {
   monaco = monaco;
-
   /**
    * 脚本内容的变化 todo 具体用来干什么的
    */
@@ -85,6 +84,7 @@ export class MonacoService {
       media.addListener(() => { this.setEditorColor( this.monaco.editor, media.matches ) });
     }
     const editor: editor.IStandaloneCodeEditor= monaco.editor.create(element, {
+      // todo 改变成模块化的model
       model: monaco.editor.createModel(content || script.content, 'typescript',),
       value: script.content,
       wordWrap: 'on',

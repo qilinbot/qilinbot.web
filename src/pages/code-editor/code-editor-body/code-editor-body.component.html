@@ -1,4 +1,4 @@
-<div class="merkaba-scripts-wrapper">
+<div class="merkaba-scripts-wrapper" style="height: 100%">
   <nz-tabset
     [(nzSelectedIndex)]="currentScriptIndex"
     nzType="editable-card"
@@ -9,7 +9,7 @@
     @for (tab of scriptTabs; track tab) {
       <nz-tab nzClosable [nzTitle]="tab.name" style="height: 100%; width: 100%">
         <div class="code"  style="height: 100%; width: 100%;">
-          <div class="editor" [ngClass]="'editor-' + tab.id" style="height: 100vh; width: 100%;"> </div>
+          <div class="editor" [ngClass]="'editor-' + tab.id" style="height: 100%; width: 100%;"> </div>
         </div>
       </nz-tab>
     }

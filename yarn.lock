@@ -2212,6 +2212,11 @@
     "@tufjs/canonical-json" "2.0.0"
     minimatch "^9.0.4"
 
+"@tweenjs/tween.js@^25.0.0":
+  version "25.0.0"
+  resolved "http://npm.runtongqiuben.com/@tweenjs/tween.js/-/tween.js-25.0.0.tgz#7266baebcc3affe62a3a54318a3ea82d904cd0b9"
+  integrity sha512-XKLA6syeBUaPzx4j3qwMqzzq+V4uo72BnlbOjmuljLrRqdsd3qnzvZZoxvMHZ23ndsRS4aufU6JOZYpCbU6T1A==
+
 "@types/ace@*":
   version "0.0.52"
   resolved "http://npm.runtongqiuben.com/@types/ace/-/ace-0.0.52.tgz#e530e7b85e5407ed3b8c987a3719692ac0d95d4c"
@@ -5458,6 +5463,13 @@ ng-zorro-antd@18.1.1:
     "@angular/cdk" "^18.0.0"
     "@ant-design/icons-angular" "^18.0.0"
     date-fns "^2.16.1"
+    tslib "^2.3.0"
+
+ngx-json-viewer@^3.2.1:
+  version "3.2.1"
+  resolved "http://npm.runtongqiuben.com/ngx-json-viewer/-/ngx-json-viewer-3.2.1.tgz#20e5e42c4cdf8aaae763a6ac59f9821d2081ab5b"
+  integrity sha512-TTHtXsrBX+IXPqqAIsxklHPqSNmyGeQaziFZbCDJq1PnPOQmTrEHfwNrzN3LnWGhf7UxeM1cK0njegVPChwEcg==
+  dependencies:
     tslib "^2.3.0"
 
 nice-napi@^1.0.2:

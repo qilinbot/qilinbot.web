@@ -22,5 +22,11 @@ export const routes: Routes = [
       .then(m => m.CodeEditorPageComponent),
     title: '代码编辑器',
     canActivate: [AuthWebGuard],
+  },
+  {
+    path: 'test',
+    loadComponent: ()=>import('../components/test/test.component').then(m => m.TestComponent),
+    title: '测试页面',
   }
+
 ];

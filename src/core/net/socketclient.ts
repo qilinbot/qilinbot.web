@@ -1,7 +1,7 @@
 import {Observable, Subject} from 'rxjs';
 import {ObjectU} from '../utils/ObjectUtil';
 
-export class ScoketClient {
+export class SocketClient {
     private reconnectAttempts = 0;
     private sendQueue = [];
     private onOpenCallbacks = [];

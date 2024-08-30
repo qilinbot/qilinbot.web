@@ -99,7 +99,7 @@ export class CodeEditorBodyComponent implements AfterViewInit{
       script.changed = false;
       script.name = data.name;
       script.vncEnabled = script.vncEnabled || false;
-      let index = this.scripts.findIndex(item => item.id === data.id);
+      let index = this.scriptTabs.findIndex(item => item.id === data.id);
       if(index < 0){
         this.scriptTabs.push({id: script.id, name: script.name});
         index = this.scripts.push(script) - 1;
@@ -117,10 +117,18 @@ export class CodeEditorBodyComponent implements AfterViewInit{
     })
   }
 
+  /**
+   * 更新脚本的信息
+   * @param script
+   */
   async updateInfoOfScript(script: MerkabaScript) {
     if(!this.currentScript) return;
     let scriptOutLine = await this.monacoService.getCurrentScriptMenuById(this.currentScript.id);
     this.service.scriptChannel.next({ type: 'currentScript', script: script || this.currentScript, scriptOutLine })
+  }
+
+  updateModule(script: MerkabaScript) {
+    this.monacoService.editorMap
   }
 
   closeTab({ index }: { index: number }): void {
@@ -141,7 +149,6 @@ export class CodeEditorBodyComponent implements AfterViewInit{
 
       let merkabaNodes = (resp.items as MerkabaNode[]).filter(i => i.state !== 5);
       merkabaNodes.sort((a, b) => a.id.localeCompare(b.id)); // 按IP排序
-      console.log(merkabaNodes);
 
       // 将数据格式转成NzCascaderOption结构
       merkabaNodes.forEach((node: MerkabaNode) => {
@@ -166,8 +173,6 @@ export class CodeEditorBodyComponent implements AfterViewInit{
           })
         })
       })
-
-      console.log(this.nodeGroup, this.groupMap);
     })
   }
 
@@ -203,7 +208,7 @@ export class CodeEditorBodyComponent implements AfterViewInit{
     if(this.currentScript.run) return ;
     currentScript.run = true;
     let runNodeId = this.selectedNode[1];
-
+    // 发送运行脚本的状态
     this.service.scriptChannel.next({type: 'runScript', script: currentScript});
 
     this.service.runScript(currentScript, runNodeId, () => currentScript.run = false).subscribe(

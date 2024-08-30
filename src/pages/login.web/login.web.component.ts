@@ -6,7 +6,7 @@ import {ActivatedRoute} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {NzButtonComponent} from "ng-zorro-antd/button";
 import {RenderService} from "../../core/render.service";
-import {ScoketClient} from "../../core/net/socketclient";
+import {SocketClient} from "../../core/net/socketclient";
 export enum AuthCardStatus {
   LOGIN,//user password
   REGISTER,//register
@@ -42,7 +42,7 @@ export class LoginWebComponent implements OnInit{
 
   qrCodeUrl:string="";//登录二维码
 
-  public socket: ScoketClient;
+  public socket: SocketClient;
   constructor(
     public userService: UserService,
     // public userService: UserService,
@@ -159,7 +159,7 @@ export class LoginWebComponent implements OnInit{
   protected initSocket() {
     let self = this;
     let cookieId: string = this.ctx.id;
-    this.socket = new ScoketClient(this.ctx.env.webSocket('auth'), cookieId);
+    this.socket = new SocketClient(this.ctx.env.webSocket('auth'), cookieId);
     this.socket.connect(false);
     this.socket.onError(resp => {
       console.log(resp);

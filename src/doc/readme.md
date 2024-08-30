@@ -1,17 +1,24 @@
-### 断点调试
-1. 在代码中设置断点
-   保存打上的断点信息，然后带上断点信息给后端
-2. 运行调试（根据下列的断点操作 服务器给出相应的返回）
-     - 逐个过程
-     - 单步调试
-     - 断开调试
-     - 重启调试
 
-前端需要展示的区域
-1. 代码的调试输出区  DebugOutput
-2. 代码的调试信息区
-   - 变量信息 在调试过程中实时展示当前值  DebugVariableInfo
-   - 监视区  在调试过程中你需要监控的    DebugVariableMonitor
+
+### 断点调试
+1. 断点的可视化
+   1）在代码编辑器中实现断点标记以及在运行过程中执行行的高亮显示
+   2）点击行号添加删除断点
+2. 断点的管理和同步
+  1）对于当前断点的存储
+  2）断点的同步，在调试过程中可以修改断点信息并更新同步到服务器
+3. 断点调试的交互
+   提供一个调试控制面板或工具栏，包含以下操作按钮：
+   启动调试：调用 startDebugging API，开始调试会话。
+   单步执行：调用 stepOver 或 stepOne API，逐步执行代码。
+   暂停/继续：支持暂停和继续调试（通常可以复用单步执行按钮）。
+   停止调试：调用 stopDebugging API，停止当前调试会话。
+   重启调试：调用 restartDebugging API，重新启动调试会话。
+4. 调试信息区（DebugVariableMonitor）
+   在 DebugVariableMonitor 中显示当前调试状态下的变量和值。
+   // 支持用户添加表达式监视，实时显示表达式的计算结果。
+   在每一步调试操作后，自动更新监视区中的内容。
+
 
 辅助的Service
 - DebugWebSocketService：获取传输断点调试信息
@@ -230,13 +237,75 @@ function hello(a: Person){
 
 
 ### 代码跳转
-默认是在本文件中跳转（monaco自带）
-基于模块化延伸出的问题：
-- 引用的文件需要把声明注入到当前文件 提供悬浮提示、除代码报错等
-- 代码跳转跨文件跳转，跳转到声明的文件处（需要模块化的支持）
 
 实现方案：
-1. monaco本身是支持模块化的 声明在模块化中文件是自动能够跳转的
+1. monaco本身是支持模块化的 声明在模块化中文件是自动能够跳转的，如果跨文件先拦截他的跳转信息，我新建一个tab创建monaco实例之后，利用拦截的跳转信息，光标视图可以定位到跳转该内容的位置。
+2. 保证monaco的新建实例共享同一组文件module， 在monaco-service 中维护一个文件module的映射关系，在新建monaco实例的时候，把文件module映射关系注入到monaco实例中，这样就可以保证跨文件跳转的时候，能够找到对应的文件module 支持增删文件对应删除module中的文件
+
+
+增加一套模块化的管理（monaco-service）
+1. 在monaco初始化，加载所有的脚本文件 并创建对应的模块配置（之后所有的实例创建都通过于此展开）
+2. 增删文件的时候，更新模块配置 
+3. 文件跳转， 监听拦截跳转文件外的信息，新建tab monaco实例， 以及视图的定位操作
+4. 
+
+```ts
+
+models = {}
+
+import {MerkabaScript} from "./code-editor.page.const";
+import {model} from "@angular/core";
+
+models = {}
+
+// 创建一个新的tab的时候 创建的是在模块化当中model 这样可以实现共享语言服务和类型检查
+function openScriptEditor(filePath: string, data: MerkabaScript) {
+  const uri = monaco.Uri.parse(`file:///${filePath}`);
+  const model = monaco.editor.createModel(data.content, data.language, uri);
+  models[uri.toString()] = model;
+  this.monacoService.createEditor(script, element, model)
+  // 添加tab信息
+}
+
+function closeScriptEditor(filePath: string) {
+  const uri = monaco.Uri.parse(`file:///${filePath}`);
+  const model = models[uri.toString()];
+  if (model) {
+    model.dispose();
+    delete models[uri.toString()];
+  }
+}
+
+```
+
+基本的思路
+```ts
+
+// 打开文件并创建 Tab
+function openFileInTab(filePath, fileContent) {
+  const uri = monaco.Uri.parse(`file:///${filePath}`);
+  
+  // 检查模型是否已存在
+  if (!models[uri.toString()]) {
+    const model = monaco.editor.createModel(fileContent, 'javascript', uri);
+    models[uri.toString()] = model;
+  }
+
+  // 创建新的 Tab，关联到文件模型
+  const tab = {
+    id: `tab-${tabs.length + 1}`,
+    title: filePath.split('/').pop(),
+    model: models[uri.toString()],
+    editor: null // Monaco 编辑器实例将稍后创建
+  };
+
+  tabs.push(tab);
+  createEditorForTab(tab);
+  setActiveTab(tab.id);
+}
+
+```
+
 ```ts
 // 创建多个文件模型
 const models = {
@@ -284,7 +353,9 @@ editor.onMouseDown((event) => {
 
       // 如果跳转到的模型不在当前视图中，切换到该模型
       if (models[uri] && model !== models[uri]) {
-        editor.setModel(models[uri]);
+        // 新建tab 创建monaco实例 加载对应url的内容
+        
+        // editor.setModel(models[uri]);
       }
     });
   }
