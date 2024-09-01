@@ -1,9 +1,9 @@
 import { Injectable, NgZone} from '@angular/core';
-import { Subject } from 'rxjs';
+import {async, firstValueFrom, map, Subject} from 'rxjs';
 import {editor, languages} from "monaco-editor";
 import {CodeDeclareService} from "./code-declare.service";
-import {IScriptOutLine} from "./code-editor.service";
-import {MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
+import {CodeEditorService, IScriptOutLine} from "./code-editor.service";
+import {MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
 import {editorThemeConfig, language} from "../pages/code-editor/const/merkaba.editor.language";
 import * as monaco from 'monaco-editor';
 @Injectable({
@@ -20,18 +20,32 @@ export class MonacoService {
    */
   public editorMap: Map<string, editor.IStandaloneCodeEditor > = new Map<string, editor.IStandaloneCodeEditor>();
 
-  imgSrc: string | ArrayBuffer | null;
+  // 当个应用的文件模型
+  public models = {};
   // 代码提示的声明文件
   codeDeclareValue: string
 
   constructor(
-    ngZone: NgZone,
-    private service: CodeDeclareService
+    private service: CodeDeclareService,
+    private codeEditorService: CodeEditorService
     ) {
     // 获取编写脚本的代码提示
     this.service.readDeclare().subscribe(res => {
       this.codeDeclareValue = res.content
     })
+  }
+
+  async initModels(scriptList: MerkabaRecord[]): Promise<void> {
+    const modelPromises = scriptList.map(async (item) => {
+      if (item.type === 1 || item.type === 0) {
+        await this.initModels(item.children);  // 递归处理子项
+      } else if (item.type === 2) {
+        const url = 'file:///' + item.uri + '.ts';
+        const content: MerkabaScript = await firstValueFrom(this.codeEditorService.readScript(item.id));
+        this.models[url] = this.monaco.editor.createModel(content.content, 'typescript',  monaco.Uri.parse(url));
+      }
+    });
+    await Promise.all(modelPromises);
   }
 
   /**
@@ -55,26 +69,17 @@ export class MonacoService {
   }
 
   /**
-   * 获取创建的编辑器实例
-   * @param id
-   */
-  public getEditorById(id: string):editor.IStandaloneCodeEditor {
-    console.log(id)
-    console.log(this.editorMap)
-    return this.editorMap.get(id)
-  }
-
-  /**
    * 创建一个编辑器实例
    * @param script 脚本的内容
    * @param element  挂载的dom元素
-   * @param content  脚本内容不存在的时候 可以指定内容
    */
-  public createEditor(script: MerkabaScript, element: any, content?:string) {
+  public createEditor(script: MerkabaScript, element: any) {
+    const model = this.models['file:///' + script.uri + '.ts'];
+    if (!model) {
+      console.error('Model not found for:', script.uri);
+      return;
+    }
     let media = window.matchMedia('(prefers-color-scheme: dark)')
-
-    // this.monaco = (window as any).monaco;
-    console.log(this.monaco)
     this.initCustomerKey()
     this.setEditorColor(this.monaco.editor, media.matches)
     // 检测颜色切换主题
@@ -84,8 +89,7 @@ export class MonacoService {
       media.addListener(() => { this.setEditorColor( this.monaco.editor, media.matches ) });
     }
     const editor: editor.IStandaloneCodeEditor= monaco.editor.create(element, {
-      // todo 改变成模块化的model
-      model: monaco.editor.createModel(content || script.content, 'typescript',),
+      model: model,
       value: script.content,
       wordWrap: 'on',
       automaticLayout: true,
@@ -108,14 +112,20 @@ export class MonacoService {
     this.initEditorEvent(editor, script.id)
   }
 
-  public async getCurrentScriptMenuById(id:string):Promise<IScriptOutLine> {
-    const model = this.editorMap.get(id).getModel()
-    // 获取语言工作线程
-    const getTypeScriptWorker = await this.monaco.languages.typescript.getTypeScriptWorker()
-    // todo 修改了 uri传入类型
-    const work:languages.typescript.TypeScriptWorker = await getTypeScriptWorker(model.uri)
-    return await work.getNavigationTree(model.uri.toString())
+  public async getCurrentScriptMenuById(uri: string, id: string): Promise<IScriptOutLine> {
+    const model = this.models['file:///' + uri + '.ts'];
+
+    if (!model) {
+      throw new Error('Model not found!');
+    }
+
+
+    const getTypeScriptWorker = await monaco.languages.typescript.getTypeScriptWorker();
+    const worker = await getTypeScriptWorker(model.uri);
+
+    return await worker.getNavigationTree(model.uri.toString());
   }
+
 
   decorationId
   public revealLine(id: string, value) {
@@ -298,28 +308,34 @@ export class MonacoService {
         onlyVisible: true,  // 只对当前可见区域内的代码进行诊断检查
     })
     this.monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-        // 编译的ES版本
-        target: this.monaco.languages.typescript.ScriptTarget.ES2020,
-        // 允许在ts中引用非ts文件
-        allowNonTsExtensions: true,
-        // 指定使用的模块
-        moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-        module: this.monaco.languages.typescript.ModuleKind.CommonJS,
-        // 是否生成输出文件
-        noEmit: false,
+      module: this.monaco.languages.typescript.ModuleKind.ESNext,
+      moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      target: this.monaco.languages.typescript.ScriptTarget.ES2020,
+      allowSyntheticDefaultImports: true,
+      allowJs: true,
+      checkJs: true,
+      noEmit: true,
     });
-    this.monaco.languages.typescript.typescriptDefaults.addExtraLib(this.codeDeclareValue, 'merkaba.d.ts');
-
-    // this.monaco.languages.register({
-    //   id: 'merkabaLanguage',
-    //   aliases: ['MyCustomLanguage', 'mycustomlanguage'],
-    // })
 
 
-    // monaco.languages.setMonarchTokensProvider('typescript', {
-    //   ...this.monaco.languages.typescript.typescriptDefaults,
-    //   ...language
-    // })
+    // this.monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    //
+    //   // module: monaco.languages.typescript.ModuleKind.ESNext,
+    //     allowSyntheticDefaultImports: true,
+    //     allowJs: true,
+    //     checkJs: true,
+    //     // 编译的ES版本
+    //     target: this.monaco.languages.typescript.ScriptTarget.ES2020,
+    //     // 允许在ts中引用非ts文件
+    //     allowNonTsExtensions: true,
+    //     // 指定使用的模块
+    //     moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    //     module: this.monaco.languages.typescript.ModuleKind.CommonJS,
+    //     // 是否生成输出文件
+    //     noEmit: false,
+    // });
+    this.monaco.languages.typescript.typescriptDefaults.addExtraLib(this.codeDeclareValue, 'file:///merkaba.d.ts');
+
 
     this.monaco.editor.defineTheme('myCustom-theme-dark', {
       base: 'vs-dark', // 选择一个基础主题
@@ -337,65 +353,5 @@ export class MonacoService {
     this.monaco.editor.setTheme(darkMode ? 'myCustom-theme-dark' :'myCustom-theme')
   }
 
-  private async getParseImgSrc(e) {
-    let files = e.clipboardData.files
-    // 找到图片文件file
-    console.log(files)
-    if(!files || files.length < 0 || !(files[0]?.type === "image/png")) {
-      console.log("不是图片");
-      this.imgSrc = ''
-      return
-    }
-
-    let fr = new FileReader();
-    // 读取 file 然后返回 data:URL 格式的字符串（base64 编码）以表示所读取文件的内容。
-    fr.readAsDataURL(files[0]);
-    fr.onload = (e) => {
-      this.imgSrc = e.target.result
-    }
-  }
-
-  private setImgStyle(editor, range) {
-    console.log(range)
-    editor.createDecorationsCollection([
-      {
-        range,
-        options: { inlineClassName: "code-span" },
-      },
-    ]);
-  }
-
-  /**
-   * todo 添加小部件
-   * @param script
-   */
-  private insetImg(script: MerkabaScript) {
-    // var contentWidget = {
-    //   domNode: null,
-    //   getId: function() {
-    //     return 'my.content.widget';
-    //   },
-    //   getDomNode: () => {
-    //     if (!contentWidget.domNode) {
-    //       contentWidget.domNode = document.createElement('div');
-    //       contentWidget.domNode.innerHTML = `
-    //         <img width="20px" height="20px" src="/src/assets/head.png" />
-    //       `;
-    //     }
-    //     return contentWidget.domNode;
-    //   },
-    //   getPosition: () => {
-    //     return {
-    //       position: {
-    //         lineNumber: 6,
-    //         column: 1
-    //       },
-    //       preference: [this.monaco.editor.ContentWidgetPositionPreference.ABOVE,
-    //         this.monaco.editor.ContentWidgetPositionPreference.BELOW]
-    //     };
-    //   }
-    // };
-    // script.monacoEditor.addContentWidget(contentWidget);
-  }
 
 }

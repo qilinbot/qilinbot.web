@@ -4,7 +4,7 @@ import {CommonModule, NgClass, NgForOf, NgStyle} from "@angular/common";
 import {NzTabComponent, NzTabSetComponent} from "ng-zorro-antd/tabs";
 import {CodeEditorService} from "../../../services/code-editor.service";
 import {MonacoService} from "../../../services/monaco.service";
-import {MerkabaNode, MerkabaScript} from "../const/code-editor.page.const";
+import {MerkabaNode, MerkabaRecord, MerkabaScript} from "../const/code-editor.page.const";
 import {NzSwitchComponent} from "ng-zorro-antd/switch";
 import {FormsModule} from "@angular/forms";
 import {NzButtonComponent} from "ng-zorro-antd/button";
@@ -72,11 +72,10 @@ export class CodeEditorBodyComponent implements AfterViewInit{
 
   constructor(public service: CodeEditorService, public monacoService: MonacoService, private render: RenderService) {
     this.service.scriptChannel.subscribe(e => {
-      console.log(e);
       switch (e.type){
         case "openScript":
           if(e.script.type !== 2) return;
-          this.openScriptEditor(e.script);
+          this.openScriptEditor(e.uri, e.script);
           break;
       }
     })
@@ -87,12 +86,13 @@ export class CodeEditorBodyComponent implements AfterViewInit{
   }
 
   /**
-   * 打开脚本编辑器
+   * 打开脚本编辑器 创建一个tab
+   * @param uri
    * @param data
    */
-  openScriptEditor(data: MerkabaScript): void {
-    if(!data.id) return;
-    console.log(data);
+  openScriptEditor(uri: string, data: MerkabaScript): void {
+    if(!uri) return;
+    console.log(uri);
     this.prepareRunScriptId = data.id;
     this.service.readScript(data.id).subscribe(resp => {
       let script: MerkabaScript = resp as MerkabaScript;
@@ -111,11 +111,37 @@ export class CodeEditorBodyComponent implements AfterViewInit{
       }
       setTimeout( async () => {
         let element: any = document.querySelector(`.editor-${script.id}`);
-        this.monacoService.createEditor(script, element, data.content);
+        this.monacoService.createEditor(script, element);
         this.updateInfoOfScript(script)
       }, 150)
     })
   }
+  // openScriptEditor(data: MerkabaScript): void {
+  //   if(!data.id) return;
+  //   console.log(data);
+  //   this.prepareRunScriptId = data.id;
+  //   this.service.readScript(data.id).subscribe(resp => {
+  //     let script: MerkabaScript = resp as MerkabaScript;
+  //     script.changed = false;
+  //     script.name = data.name;
+  //     script.vncEnabled = script.vncEnabled || false;
+  //     let index = this.scriptTabs.findIndex(item => item.id === data.id);
+  //     if(index < 0){
+  //       this.scriptTabs.push({id: script.id, name: script.name});
+  //       index = this.scripts.push(script) - 1;
+  //     }
+  //     this.currentScriptIndex = index;
+  //     if (document.querySelector(`.editor-${script.id} .monaco-editor`)) {
+  //       this.updateInfoOfScript(script)
+  //       return;
+  //     }
+  //     setTimeout( async () => {
+  //       let element: any = document.querySelector(`.editor-${script.id}`);
+  //       this.monacoService.createEditor(script, element, data.content);
+  //       this.updateInfoOfScript(script)
+  //     }, 150)
+  //   })
+  // }
 
   /**
    * 更新脚本的信息
@@ -123,13 +149,10 @@ export class CodeEditorBodyComponent implements AfterViewInit{
    */
   async updateInfoOfScript(script: MerkabaScript) {
     if(!this.currentScript) return;
-    let scriptOutLine = await this.monacoService.getCurrentScriptMenuById(this.currentScript.id);
-    this.service.scriptChannel.next({ type: 'currentScript', script: script || this.currentScript, scriptOutLine })
+    // let scriptOutLine = await this.monacoService.getCurrentScriptMenuById(this.currentScript.uri, this.currentScript.id);
+    // this.service.scriptChannel.next({ type: 'currentScript', script: script || this.currentScript, scriptOutLine })
   }
 
-  updateModule(script: MerkabaScript) {
-    this.monacoService.editorMap
-  }
 
   closeTab({ index }: { index: number }): void {
     this.scriptTabs.splice(index, 1);

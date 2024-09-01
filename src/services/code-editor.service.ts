@@ -70,6 +70,7 @@ export interface IScriptEvent {
   script?: MerkabaScript
   scripts?: Array<MerkabaScript>
   scriptOutLine?: IScriptOutLine
+  uri?: string
 }
 
 /**

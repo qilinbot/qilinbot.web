@@ -6,12 +6,6 @@ import {NzAutosizeDirective, NzInputDirective, NzInputGroupComponent} from "ng-z
 import {
   NzTreeFlatDataSource,
   NzTreeFlattener,
-  NzTreeNodeComponent,
-  NzTreeNodeDefDirective,
-  NzTreeNodeNoopToggleDirective,
-  NzTreeNodeOptionComponent,
-  NzTreeNodePaddingDirective,
-  NzTreeNodeToggleRotateIconDirective, NzTreeView,
   NzTreeViewComponent, NzTreeViewModule,
 } from "ng-zorro-antd/tree-view";
 import {FlatTreeControl} from '@angular/cdk/tree';
@@ -33,6 +27,7 @@ import {FileEditModalComponent} from "../file-edit-modal/file-edit-modal.compone
 import {RenderService} from "../../../../core/render.service";
 import {NzTooltipDirective} from "ng-zorro-antd/tooltip";
 import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
+import {MonacoService} from "../../../../services/monaco.service";
 
 export enum EIconType {
   'xpa-wangzhan',
@@ -117,8 +112,10 @@ export class FileFolderComponent {
 
   dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
-  constructor(private service: CodeEditorService, private dialogService: DialogService, private render: RenderService) {
+  constructor(private service: CodeEditorService, private dialogService: DialogService, private render: RenderService, private monaco: MonacoService) {
     this.service.load({}).subscribe(resp => {
+      // tood 初始化monaco的所有模块
+      this.monaco.initModels(resp.items);
       this.fileData = resp.items;
       this.dataSource.setData(resp.items);
     })
@@ -127,11 +124,11 @@ export class FileFolderComponent {
   hasChild = (_: number, node: FlatNode): boolean => node.expandable;
 
   /**
-   * 加载脚本编辑器
+   * 加载脚本编辑器  所有的加载全部通过路径去加载
    * @param e
    */
   toLoadScript(e){
-    this.service.scriptChannel.next({type: 'openScript', script: e})
+    this.service.scriptChannel.next({type: 'openScript', script: e, uri: e.uri});
   }
 
   /**

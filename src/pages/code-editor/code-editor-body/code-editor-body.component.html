@@ -1,20 +1,4 @@
-<div class="merkaba-scripts-wrapper" style="height: 100%">
-  <nz-tabset
-    [(nzSelectedIndex)]="currentScriptIndex"
-    nzType="editable-card"
-    (nzAdd)="newTab()"
-    (nzClose)="closeTab($event)"
-    style="height: 100%; width: 100%;"
-  >
-    @for (tab of scriptTabs; track tab) {
-      <nz-tab nzClosable [nzTitle]="tab.name" style="height: 100%; width: 100%">
-        <div class="code"  style="height: 100%; width: 100%;">
-          <div class="editor" [ngClass]="'editor-' + tab.id" style="height: 100%; width: 100%;"> </div>
-        </div>
-      </nz-tab>
-    }
-  </nz-tabset>
-<!-- 编辑器的按钮  -->
+<div class="merkaba-scripts-wrapper">
   <div class="merkaba-script-btns">
     <span (click)="enabledVNC = !enabledVNC" class="merkaba-script-btn-vnc" *ngIf="currentScript">
 <!--      <em>vnc</em>-->
@@ -24,7 +8,7 @@
                  nzUnCheckedChildren="关闭VNC"
       ></nz-switch>
     </span>
-<!--  vnc 的选择  -->
+    <!--  vnc 的选择  -->
     <span class="merkaba-script-btn-vnc">
       <i (click)="refreshNodes()" style="font-size: 16px;color: #1990ff;margin-right: 5px" class="XPA xpa-refresh"></i>
       <nz-cascader
@@ -67,4 +51,19 @@
       </button>
     </span>
   </div>
+  <nz-tabset
+    [(nzSelectedIndex)]="currentScriptIndex"
+    nzType="editable-card"
+    (nzAdd)="newTab()"
+    (nzClose)="closeTab($event)"
+    style="height: 100%; width: 100%;"
+  >
+    @for (tab of scriptTabs; track tab) {
+      <nz-tab nzClosable [nzTitle]="tab.name" style="height: 100%; width: 100%">
+        <div class="code"  style="height: 100%; width: 100%;">
+          <div class="editor" [ngClass]="'editor-' + tab.id" style="height: 100%; width: 100%;"> </div>
+        </div>
+      </nz-tab>
+    }
+  </nz-tabset>
 </div>
