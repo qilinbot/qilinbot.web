@@ -28,6 +28,7 @@ import {RenderService} from "../../../../core/render.service";
 import {NzTooltipDirective} from "ng-zorro-antd/tooltip";
 import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
 import {MonacoService} from "../../../../services/monaco.service";
+import {FocusKeyManager} from "@angular/cdk/a11y";
 
 export enum EIconType {
   'xpa-wangzhan',
@@ -109,9 +110,7 @@ export class FileFolderComponent {
     node => node.expandable,
     node => node.children
   );
-
   dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
-
   constructor(private service: CodeEditorService, private dialogService: DialogService, private render: RenderService, private monaco: MonacoService) {
     this.service.load({}).subscribe(resp => {
       // tood 初始化monaco的所有模块
@@ -119,6 +118,7 @@ export class FileFolderComponent {
       this.fileData = resp.items;
       this.dataSource.setData(resp.items);
     })
+
   }
 
   hasChild = (_: number, node: FlatNode): boolean => node.expandable;
@@ -129,6 +129,7 @@ export class FileFolderComponent {
    */
   toLoadScript(e){
     this.service.scriptChannel.next({type: 'openScript', script: e, uri: e.uri});
+    this.service.scriptChannel.next({type: 'switchScript', script: e});
   }
 
   /**
@@ -203,7 +204,6 @@ export class FileFolderComponent {
     if (editRecord.parentId) {
       editRecord.parentRecord = this.selectListSelection.selected[0].parentRecord;
     }
-
   }
 
   /**
@@ -228,7 +228,7 @@ export class FileFolderComponent {
   }
 
   /**
-   * todo 脚本新版本的发布
+   * 脚本新版本的发布
    */
   publishScript(node: FlatNode) {
     this.service.publishScript(node.id).subscribe(resp => {

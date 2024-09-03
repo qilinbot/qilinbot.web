@@ -28,5 +28,4 @@ export const routes: Routes = [
     loadComponent: ()=>import('../components/test/test.component').then(m => m.TestComponent),
     title: '测试页面',
   }
-
 ];

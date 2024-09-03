@@ -7,6 +7,8 @@ import {CodeEditorService} from "../../../services/code-editor.service";
 import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
 import {SocketClient} from "../../../core/net/socketclient";
 import {ContextService} from "../../../core/context.service";
+import {WebsocketService} from "../../../services/websocket.service";
+import {MerkabaScript} from "../const/code-editor.page.const";
 
 @Component({
   selector: 'app-code-editor-log',
@@ -25,14 +27,20 @@ import {ContextService} from "../../../core/context.service";
 })
 export class CodeEditorLogComponent {
   @ViewChild('scrollLogs', {static: false}) scrollLogs: VirtualScrollerComponent;
+  // 用于记录所有连接所创建的实例
+  protected busInstances: Map<string, {infos: Array<any>, instance?: any}> = new Map();
+
   items = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28'];
-  ws: SocketClient
-  constructor(private service: CodeEditorService, private ctx: ContextService) {
+  ws: SocketClient;
+  // 当前运行的脚本url
+  currentId: string = ''
+  constructor(private service: CodeEditorService, private ctx: ContextService, ) {
     console.log(document.cookie);
     this.service.scriptChannel.subscribe((resp) => {
       switch (resp.type){
         case 'runScript':
           // todo 建立websocket连接 获取运行的信息
+          this.updateBusSub(resp.script);
           break;
         case 'closeScript':
           // todo 关闭websocket连接
@@ -46,19 +54,26 @@ export class CodeEditorLogComponent {
   /**
    * 遵循channel  instance  uri 的规则 去建立websocket连接
    *
-   * @param url
+   * @param script
    */
-  updateBusSub(url: string){
-    console.log(document.cookie)
-    if(!this.ws){
-      this.ws = new SocketClient(url, this.ctx.id);
-      this.ws.connect(false);
-      const final: string = JSON.stringify({
-        action: ''
-      })
-      // this.ws.send()
-      this.ws.onMessage((msg) => {console.log(msg)});
+  updateBusSub(script: MerkabaScript){
+    if(!script.uri) return;
+    this.ws.connect();
+    this.ws.onMessage(res => {
+      console.log(res);
+      this.scrollInto(res);
+    })
+
+    const data = {
+      action: 'subscribe',
+      header: {
+        channel: 'merkaba',
+        topic: 'script',
+        instance: script.uri
+      },
+      body: {},
     }
+    this.ws.send(data)
   }
 
   onSearch(term){

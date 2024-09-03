@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import * as monaco from 'monaco-editor';
+import { Uri } from 'monaco-editor';
 
 @Component({
   selector: 'app-test',
@@ -13,66 +14,50 @@ export class TestComponent {
   constructor() {}
 
   ngAfterViewInit(): void {
-    // 注册 TypeScript 和 JavaScript 语言支持
-    monaco.languages.register({ id: 'javascript' });
+    // 注册 JavaScript 和 TypeScript 语言
     monaco.languages.register({ id: 'typescript' });
 
-    const models = {
-      'file:///main.ts': monaco.editor.createModel(`
-    import { sayHello } from './hello.ts';
-    sayHello();
-  `, 'javascript', monaco.Uri.parse('file:///main.ts')),
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES2015,
+      module: monaco.languages.typescript.ModuleKind.CommonJS,
+      allowJs: true,
+      checkJs: true,
+      noEmit: true
+    });
 
-      'file:///hello.ts': monaco.editor.createModel(`
-    export function sayHello() {
-      console.log('Hello World');
-    }
-  `, 'javascript', monaco.Uri.parse('file:///hello.ts'))
-    };
 
+    // 添加 JSDoc 类型定义和 Person 类声明
+    monaco.languages.typescript.typescriptDefaults.addExtraLib(`
+      /**
+       * @typedef {Object} Person
+       * @property {string} someProperty - 示例属性
+       * @property {function(): void} someMethod - 示例方法
+       */
+      declare class Person {
+          constructor();
+          someProperty: string;
+          someMethod(): void;
+      }
+    `, 'file:///Person.d.ts');
+
+    // 创建模型
+    const model = monaco.editor.createModel(`
+      /**
+       * @param {Person} p
+       */
+      function test(p) {
+          p.someProperty;
+          p.someMethod();
+      }
+    `, 'typescript', Uri.parse('file:///main.ts'));
+
+    // 创建编辑器
     const editor = monaco.editor.create(this.editorContainer.nativeElement, {
-      model: models['file:///main.ts'],
+      model: model,
       language: 'typescript',
       theme: 'vs-dark',
       automaticLayout: true
     });
-
-    this.initEvent(editor, models);
-  }
-
-  initEvent(editor: monaco.editor.IStandaloneCodeEditor, models: any): void {
-    editor.onMouseDown(async (event) => {
-      const position = event.target.position;
-
-      if (position) {
-        try {
-          const targetModelUri = await this.getTargetModelUri(position, editor);
-          console.log(targetModelUri);
-          if (targetModelUri && targetModelUri !== editor.getModel()?.uri.toString() && models[targetModelUri]) {
-            editor.setModel(models[targetModelUri]);
-          }
-        } catch (err) {
-          console.error('Error occurred while navigating to declaration:', err);
-        }
-      }
-    });
-  }
-
-  async getTargetModelUri(position: monaco.Position, editor: monaco.editor.IStandaloneCodeEditor): Promise<string | null> {
-    const model = editor.getModel();
-    if (!model) return null;
-
-    const worker = await monaco.languages.typescript.getTypeScriptWorker();
-    const client = await worker(model.uri);
-
-    const definitions = await client.getDefinitionAtPosition(model.uri.toString(), 1);
-
-    if (definitions && definitions.length > 0) {
-      const target = definitions[0];
-      const targetUri = target.uri;
-      return targetUri.toString();
-    }
-
-    return null;
+    // 还是无法实现
   }
 }

@@ -1,4 +1,4 @@
-<nz-tree-view #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true" style="height: 100%; overflow-y: scroll">
+<nz-tree-view *ngIf="dataSource && treeControl" #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true" style="height: 100%; overflow-y: scroll">
   <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
     <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
     <nz-tree-node-option
@@ -9,7 +9,8 @@
     >
       <!--   叶子结点   -->
       <div class="list-noleaf">
-        <span nz-icon [nzType]="node.type === 2 ? 'file' : 'folder-open'" nzTheme="outline"></span>
+        <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
+<!--        <span nz-icon [nzType]="node.type === 2 ? 'file' : 'folder-open'" nzTheme="outline"></span>-->
         <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
       </div>
     </nz-tree-node-option>
@@ -26,7 +27,8 @@
     >
       <!--   非叶子结点 （肯定是文件夹）  -->
       <div class="list-noleaf">
-        <span nz-icon [nzType]="treeControl.isExpanded(node) ? 'folder-open' : 'folder'" nzTheme="outline"></span>
+        <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
+<!--        <span nz-icon [nzType]="treeControl.isExpanded(node) ? 'folder-open' : 'folder'" nzTheme="outline"></span>-->
         <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
       </div>
     </nz-tree-node-option>
@@ -36,7 +38,6 @@
 <ng-template #treeList let-node>
   <div class="list-item">
     <div class="list-item-left">
-      <!--      <i class="XPA" [ngClass]="iconType[node.type]"></i>-->
       <span nz-tooltip [nzTooltipTitle]="node.title" class="site-name">{{ node.name }}</span>
     </div>
     <div class="list-item-right">
@@ -55,6 +56,10 @@
       </p>
     </div>
   </div>
+</ng-template>
+
+<ng-template let-node #treeViewIcon>
+  <span nz-icon [nzType]="(node.type === 1 || node.type === 0)  ? (treeControl.isExpanded(node) ? 'folder-open' : 'folder') : 'file'" nzTheme="outline"></span>
 </ng-template>
 
 

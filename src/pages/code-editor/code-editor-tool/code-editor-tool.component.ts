@@ -39,6 +39,7 @@ export class CodeEditorToolComponent implements AfterViewInit {
   constructor(
     public service: CodeEditorService,
   ) {
+    this.changeToolStatus(this.tools[0], 0)
     this.service.windowChannel.subscribe(res => {
       if (res.name != "tool") return
       const index = this.tools.findIndex(item => item.isActive)
@@ -55,13 +56,12 @@ export class CodeEditorToolComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.changeToolStatus(this.tools[0], 0)
+
   }
 
   changeToolStatus(tool: ITool, index: number) {
     tool.isActive = !tool.isActive
     this.showTool = this.tools.some(item => item.isActive)
-    console.log(this.showTool)
     if (!tool.isActive) {
       const index = this.tools.findIndex(item => item.isActive)
       if (index > -1) return

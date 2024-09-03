@@ -5455,7 +5455,7 @@ ng-devui@^17.1.0:
     lodash-es "^4.17.15"
     tslib "^2.0.0"
 
-ng-zorro-antd@18.1.1:
+ng-zorro-antd@^18.1.1:
   version "18.1.1"
   resolved "http://npm.runtongqiuben.com/ng-zorro-antd/-/ng-zorro-antd-18.1.1.tgz#a0880494650332e792a3c5f3442b3623a4f3d6b1"
   integrity sha512-YbJN/87XGsKbAwBJH7ci/01Y30QCwJsQU8FtVhtAd5JsB/NsBAfYfsIoPgch6ZUPZ3Jo2+3UA/pTCx1DliagHg==

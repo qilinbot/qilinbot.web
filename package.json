@@ -28,7 +28,7 @@
     "jsoneditor": "^10.1.0",
     "monaco-editor": "^0.50.0",
     "ng-devui": "^17.1.0",
-    "ng-zorro-antd": "18.1.1",
+    "ng-zorro-antd": "^18.1.1",
     "ngx-json-viewer": "^3.2.1",
     "rxjs": "~7.8.0",
     "sweetalert2": "^11.12.4",

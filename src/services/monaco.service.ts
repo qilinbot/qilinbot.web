@@ -1,6 +1,6 @@
 import { Injectable, NgZone} from '@angular/core';
 import {async, firstValueFrom, map, Subject} from 'rxjs';
-import {editor, languages} from "monaco-editor";
+import {editor, languages, Position} from "monaco-editor";
 import {CodeDeclareService} from "./code-declare.service";
 import {CodeEditorService, IScriptOutLine} from "./code-editor.service";
 import {MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
@@ -19,34 +19,59 @@ export class MonacoService {
    * 保存所有编辑器实例
    */
   public editorMap: Map<string, editor.IStandaloneCodeEditor > = new Map<string, editor.IStandaloneCodeEditor>();
+  // 保存所有的脚本文件 uri -》 merkabascript
+  public editorScript: Map<string, MerkabaScript> = new Map<string, MerkabaScript>();
 
   // 当个应用的文件模型
   public models = {};
   // 代码提示的声明文件
   codeDeclareValue: string
 
+  // 当前正在使用的实例  切换tab 要同步，创建tab同步
+  currentEditor: monaco.editor.IStandaloneCodeEditor;
+
   constructor(
     private service: CodeDeclareService,
     private codeEditorService: CodeEditorService
-    ) {
-    // 获取编写脚本的代码提示
-    this.service.readDeclare().subscribe(res => {
-      this.codeDeclareValue = res.content
+  ) {
+  // 获取编写脚本的代码提示
+  this.service.readDeclare().subscribe(res => {
+    console.log(res);
+    this.codeDeclareValue = res.content
+  })
+
+
+    this.codeEditorService.scriptChannel.subscribe(res => {
+      switch (res.type){
+        case 'switchScript':
+          this.currentEditor = this.editorMap.get(res.script.id);
+          console.log(this.currentEditor)
+      }
     })
   }
 
+  /**
+   * 初始化编辑器模块化
+   * @param scriptList 所有record记录
+   */
   async initModels(scriptList: MerkabaRecord[]): Promise<void> {
+    if (!scriptList || scriptList.length === 0) {
+      // scriptList 为 undefined, null 或空数组时，直接返回
+      return;
+    }
+
     const modelPromises = scriptList.map(async (item) => {
       if (item.type === 1 || item.type === 0) {
         await this.initModels(item.children);  // 递归处理子项
       } else if (item.type === 2) {
         const url = 'file:///' + item.uri + '.ts';
         const content: MerkabaScript = await firstValueFrom(this.codeEditorService.readScript(item.id));
-        this.models[url] = this.monaco.editor.createModel(content.content, 'typescript',  monaco.Uri.parse(url));
+        this.models[url] = this.monaco.editor.createModel(content.content, 'typescript', monaco.Uri.parse(url));
       }
     });
     await Promise.all(modelPromises);
   }
+
 
   /**
    * 销毁指定id的编辑器实例
@@ -74,7 +99,8 @@ export class MonacoService {
    * @param element  挂载的dom元素
    */
   public createEditor(script: MerkabaScript, element: any) {
-    const model = this.models['file:///' + script.uri + '.ts'];
+    const uri = 'file:///' + script.uri + '.ts';
+    const model = this.models[uri];
     if (!model) {
       console.error('Model not found for:', script.uri);
       return;
@@ -90,7 +116,7 @@ export class MonacoService {
     }
     const editor: editor.IStandaloneCodeEditor= monaco.editor.create(element, {
       model: model,
-      value: script.content,
+      // value: script.content,
       wordWrap: 'on',
       automaticLayout: true,
       contextmenu: true,
@@ -110,6 +136,9 @@ export class MonacoService {
     });
     this.editorMap.set(script.id, editor);
     this.initEditorEvent(editor, script.id)
+    this.currentEditor = editor;
+    this.editorScript.set(uri, script);
+
   }
 
   public async getCurrentScriptMenuById(uri: string, id: string): Promise<IScriptOutLine> {
@@ -190,28 +219,80 @@ export class MonacoService {
       }
     });
     editor.onMouseDown(  async(e) => {
-      if(!e.event.ctrlKey && !e.event.metaKey) return
-      console.log(e)
-      const model = editor.getModel()
-      let value = model.getWordAtPosition(e.target.position).word
-      console.log(e.target.range)
-      // editor.getModel().findMatches(value, new Range(e))
-      // editor.getModel().getLineDecorations()
-      console.log(value)
+      const position = e.target.position;
+      const model = editor.getModel();
+      // 跳转到对应的位置
+      if (model && position) {
+        this.goToDefinition(editor, model, position);
+      }
     })
-    // 监听粘贴事件
-    // editor.onDidPaste((e) => {
-    //   let timer = setTimeout(() => {
-    //     console.log(e)
-    //     console.log(this.imgSrc)
-    //     if(!this.imgSrc) return
-    //     script.imgSrc = this.imgSrc
-    //     this.setImgStyle(editor, e.range)
-    //     clearTimeout(timer)
-    //   }, 300)
-    // })
-    // this.initBreakPoints(script)
   }
+
+  async getDefinitionAtPosition(model: monaco.editor.ITextModel, position: monaco.Position): Promise<monaco.languages.Location[]> {
+    const worker = await monaco.languages.typescript.getTypeScriptWorker();
+    const tsWorker = await worker(model.uri);
+    const offset = model.getOffsetAt(position);
+    const fileName = model.uri.toString();
+
+    try {
+      // todo 空的返回
+      const definitions = await tsWorker.getDefinitionAtPosition(fileName, offset);
+
+      // Handle cases where definitions might be null or undefined
+      if (!definitions) {
+        console.error('No definitions found.');
+        return [];
+      }
+
+      return definitions.map(definition => {
+        if (!definition || !definition.range) {
+          console.error('Definition or definition range is missing.');
+          return null;
+        }
+
+        return {
+          uri: monaco.Uri.parse(definition.uri),
+          range: new monaco.Range(
+            definition.range.startLineNumber,
+            definition.range.startColumn,
+            definition.range.endLineNumber,
+            definition.range.endColumn
+          )
+        };
+      }).filter(def => def !== null); // Filter out any null values
+    } catch (err) {
+      console.error('Error getting definition:', err);
+      return [];
+    }
+  }
+
+  goToDefinition(editor: monaco.editor.IEditor, model: monaco.editor.ITextModel, position: monaco.Position) {
+    this.getDefinitionAtPosition(model, position).then(definitions => {
+      console.log(definitions);
+      if (definitions.length > 0) {
+        const firstDefinition = definitions[0];
+        const definitionModel = monaco.editor.getModel(firstDefinition.uri);
+
+        // 需要存储uri和script
+        const uri = firstDefinition.uri.toString();
+        // 执行他的初始化行为   光标定位到指定为止， 如果没有则到0 0
+        this.codeEditorService.scriptChannel.next({type: 'currentScript', uri: uri, script: this.editorScript.get(uri)});
+        if (definitionModel) {
+          editor.setModel(definitionModel);
+          editor.setPosition(new Position(firstDefinition.range.startLineNumber, firstDefinition.range.startColumn));
+          editor.revealRangeInCenterIfOutsideViewport(firstDefinition.range);
+        } else {
+          console.log('Definition model not found.');
+        }
+      } else {
+        console.log('No definitions found.');
+      }
+    }).catch(err => {
+      console.error('Error getting definition:', err);
+    });
+  }
+
+
 
   private initAddCommand(editor) {
     //  快捷键
@@ -299,7 +380,6 @@ export class MonacoService {
   }
 
   private initCustomerKey() {
-    console.log(this.monaco.languages)
     this.monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
         noSemanticValidation: false, // 不启用语义验证
         noSyntaxValidation: false,   // 不启用语法验证
@@ -352,6 +432,4 @@ export class MonacoService {
     // editor.setTheme(darkMode ? 'vs-dark' : 'vs')
     this.monaco.editor.setTheme(darkMode ? 'myCustom-theme-dark' :'myCustom-theme')
   }
-
-
 }

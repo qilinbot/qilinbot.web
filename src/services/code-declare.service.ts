@@ -13,7 +13,7 @@ export class CodeDeclareService {
    * @param id
    */
   readDeclare(id: string = 'default'){
-    return this.http.post('Merkaba/readDoc', {id});
+    return this.http.post('/Merkaba/readDoc', {id});
   }
 
   /**
@@ -22,6 +22,6 @@ export class CodeDeclareService {
    * @param content
    */
   updateDeclare(id: string, content: string){
-    return this.http.post('Merkaba/updateDoc', {id, content});
+    return this.http.post('/Merkaba/updateDoc', {id, content});
   }
 }

@@ -1,8 +1,7 @@
-// 现在要对于所有一个应用内的所有文件进行模块化， 能够互相引用
 
 
-### 断点调试
-1. 断点的可视化
+#### 断点调试
+1. 断点的维护
    1）在代码编辑器中实现断点标记以及在运行过程中执行行的高亮显示
    2）点击行号添加删除断点
 2. 断点的管理和同步
@@ -15,7 +14,7 @@
    暂停/继续：支持暂停和继续调试（通常可以复用单步执行按钮）。
    停止调试：调用 stopDebugging API，停止当前调试会话。
    重启调试：调用 restartDebugging API，重新启动调试会话。
-4. 调试信息区（DebugVariableMonitor）
+4. 调试信息区（DebugVariableMonitor） websocket fetch
    在 DebugVariableMonitor 中显示当前调试状态下的变量和值。
    // 支持用户添加表达式监视，实时显示表达式的计算结果。
    在每一步调试操作后，自动更新监视区中的内容。
@@ -33,22 +32,16 @@
 - restartDebugging
 
 ```ts
+// 在调试之前先确定要监视的变量和要提供的断点信息
 export interface DebugInfo {
   variableInfos: Variable[];       // 当前的变量信息
-  stackInfos: Stack[];             // 当前的堆栈信息
   outputInfos: Output[];           // 调试输出信息
   isOver: boolean;                 // 调试是否完成
-  nextLine: number;                // 下一行要执行的行号
-  breakpointHit: boolean;          // 是否命中断点
-  currentFile: string;             // 当前调试的文件名或路径
   currentFunction: string;         // 当前执行的函数名
   
-  executionTime: number;           // 当前执行时间（毫秒）
-  memoryUsage: number;             // 当前内存使用情况（字节）
   previousLine: number;            // 上一行执行的行号
   errorInfo: string | null;        // 错误信息（如果有）
 }
-
 ```
 
   
@@ -96,7 +89,9 @@ function hello(a: Person){
 2. 自定义声明文件.d.ts 在代码中引入
 
 ### 大纲
-页面大纲根据如下结构渲染即可
+页面大纲根据如下结构渲染即可 （函数体内部操作了什么事件）
+需要知道函数内部用到了什么其他函数的模块 在一个作用域下列出有什么， 一个函数需要具体列出使用了其他的什么模块
+
 ```json
 
 {
@@ -235,13 +230,38 @@ function hello(a: Person){
     ]
 }
 ```
+```ts
+// 正则匹配
+// 需要动态维护事件的
+export function generateOutline(code: string): OutlineEntry[] {
+  const outlines: OutlineEntry[] = [];
+  const regex = /(webClient\.load\(.*?\))|(utilModule\.click_Menu\(.*?\))|(bindSpecCodeMoudle\.bindSpecCode\(.*?\))/g;
+  let match: RegExpExecArray | null;
 
+  while ((match = regex.exec(code)) !== null) {
+    outlines.push({
+      name: match[0],
+      kind: monaco.languages.CompletionItemKind.Function,
+      range: {
+        startLineNumber: code.substr(0, match.index).split('\n').length,
+        startColumn: match.index - code.lastIndexOf('\n', match.index),
+        endLineNumber: code.substr(0, match.index + match[0].length).split('\n').length,
+        endColumn: match.index + match[0].length - code.lastIndexOf('\n', match.index + match[0].length),
+      },
+    });
+  }
+
+  return outlines;
+}
+
+```
 
 ### 代码跳转
 
 实现方案：
-1. monaco本身是支持模块化的 声明在模块化中文件是自动能够跳转的，如果跨文件先拦截他的跳转信息，我新建一个tab创建monaco实例之后，利用拦截的跳转信息，光标视图可以定位到跳转该内容的位置。
-2. 保证monaco的新建实例共享同一组文件module， 在monaco-service 中维护一个文件module的映射关系，在新建monaco实例的时候，把文件module映射关系注入到monaco实例中，这样就可以保证跨文件跳转的时候，能够找到对应的文件module 支持增删文件对应删除module中的文件
+monaco本身是支持模块化的 声明在模块化中文件是自动能够跳转的，如果跨文件先拦截他的跳转信息，我新建一个tab创建monaco实例之后，利用拦截的跳转信息，光标视图可以定位到跳转该内容的位置。
+
+保证monaco的新建实例共享同一组文件module， 在monaco-service 中维护一个文件module的映射关系，在新建monaco实例的时候，把文件module映射关系注入到monaco实例中，这样就可以保证跨文件跳转的时候，能够找到对应的文件module 支持增删文件对应删除module中的文件
 
 
 增加一套模块化的管理（monaco-service）
@@ -361,31 +381,6 @@ editor.onMouseDown((event) => {
   }
 });
 ```
-```ts
-export interface SymbolDefinition {
-  name: string;          // 符号名称
-  type: string;          // 符号类型（例如 'class', 'function', 'variable', 'interface' 等）
-  file: string;          // 所在文件路径
-  line?: number;         // 符号定义的行号（可选，用于文件内符号管理）
-  column?: number;       // 符号定义的列号（可选，用于文件内符号管理）
-  scope?: string;        // 符号的作用域（例如 'global', 'local', 'module' 等）
-  visibility?: string;   // 符号的可见性（例如 'public', 'private', 'protected' 等）
-  module?: string;       // 符号所在的模块名称（如果项目有模块化的概念）
-  isExported?: boolean;  // 是否导出（针对 TypeScript 等支持模块导出的语言）
-}
-
-export interface SymbolDefinitionResponse {
-  file: string;           // 符号定义所在文件路径
-  line: number;           // 符号定义的行号
-  column: number;         // 符号定义的列号
-  symbolType: string;     // 符号类型（例如 'class', 'function', 'variable'）
-  isDeprecated?: boolean; // 是否已弃用（如果符号已标记为弃用）
-  context?: string;       // 符号所在的上下文（例如函数体、类体等的名称）
-  documentation?: string; // 符号的文档注释（如 JSDoc 或 TypeDoc 注释），便于在跳转时展示
-}
-
-```
-
 
 ### 图片
 page.click(图片)

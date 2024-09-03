@@ -31,8 +31,13 @@ export class SocketClient {
         this.binaryType = binaryType || 'blob';
         this.dataStream = new Subject();
         this.errorMessages = new Subject();
+      console.log(this.url)
         this.url = this.url + (this.url.indexOf("?") > 0 ? "&" : "?");
-        this.url = this.url + "cookieId=" + cookieId;
+      console.log(this.url)
+
+      this.url = this.url + "cookieId=" + cookieId;
+      console.log(this.url)
+
     }
 
     public connect(force = false) {
