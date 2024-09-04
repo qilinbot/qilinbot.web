@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, OnDestroy, ViewChild} from '@angular/core';
 import {SplitAreaComponent, SplitComponent} from "angular-split";
 import {CodeEditorToolComponent} from "./code-editor-tool/code-editor-tool.component";
 import {ScriptEditorComponent} from "../../components/script-editor/script-editor.component";
@@ -19,7 +19,11 @@ import {CodeEditorLogComponent} from "./code-editor-log/code-editor-log.componen
   templateUrl: './code-editor.page.component.html',
   styleUrl: './code-editor.page.component.scss'
 })
-export class CodeEditorPageComponent {
+export class CodeEditorPageComponent implements  OnDestroy{
+  @ViewChild('runningLog') runningLog: CodeEditorLogComponent;
 
+  ngOnDestroy(): void {
+    this.runningLog.cancelAllInstance();
+  }
 
 }

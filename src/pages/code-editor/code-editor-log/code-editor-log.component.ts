@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ViewChild} from '@angular/core';
 import {SearchModule} from "ng-devui";
 import {VirtualScrollerComponent} from "../../../components/virtual-scroller/virtual-scroller.component";
 import {NgxJsonViewerModule} from "ngx-json-viewer";
@@ -30,11 +30,11 @@ export class CodeEditorLogComponent {
   // 用于记录所有连接所创建的实例
   protected busInstances: Map<string, {infos: Array<any>, instance?: any}> = new Map();
 
-  items = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28'];
+  items = [];
   ws: SocketClient;
   // 当前运行的脚本url
   currentId: string = ''
-  constructor(private service: CodeEditorService, private ctx: ContextService, ) {
+  constructor(private service: CodeEditorService, private ctx: ContextService, private wsService: WebsocketService,) {
     console.log(document.cookie);
     this.service.scriptChannel.subscribe((resp) => {
       switch (resp.type){
@@ -43,7 +43,7 @@ export class CodeEditorLogComponent {
           this.updateBusSub(resp.script);
           break;
         case 'closeScript':
-          // todo 关闭websocket连接
+          // todo 关闭websocket连接 怎么会有终止运行呢
           break;
       }
     })
@@ -58,22 +58,34 @@ export class CodeEditorLogComponent {
    */
   updateBusSub(script: MerkabaScript){
     if(!script.uri) return;
-    this.ws.connect();
-    this.ws.onMessage(res => {
-      console.log(res);
-      this.scrollInto(res);
-    })
-
-    const data = {
+    this.wsService.send({
       action: 'subscribe',
       header: {
         channel: 'merkaba',
         topic: 'script',
-        instance: script.uri
-      },
-      body: {},
-    }
-    this.ws.send(data)
+        instance: script.uri,
+      }
+    }).subscribe();
+
+    this.wsService.onMessage(res => {
+      res = JSON.parse(res.data);
+      console.log(res);
+      let item = res.body.level + ' ' + res.body.message;
+      this.items = [...this.items, item]
+    })
+  }
+
+  cancelSub(){
+    this.ws.close();
+  }
+
+  // 需要维护所有的订阅 所有的websocket
+  cancelAllInstance(){
+    this.ws.close();
+  }
+
+  test(){
+    this.ws.sendMessage('1').subscribe();
   }
 
   onSearch(term){

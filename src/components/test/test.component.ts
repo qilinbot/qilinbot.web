@@ -14,50 +14,41 @@ export class TestComponent {
   constructor() {}
 
   ngAfterViewInit(): void {
-    // 注册 JavaScript 和 TypeScript 语言
-    monaco.languages.register({ id: 'typescript' });
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: false,
+      noSyntaxValidation: false,
+    });
 
-    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-      target: monaco.languages.typescript.ScriptTarget.ES2015,
-      module: monaco.languages.typescript.ModuleKind.CommonJS,
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
       allowJs: true,
       checkJs: true,
-      noEmit: true
+      noEmit: true,
     });
 
+// extra libraries
+    monaco.languages.typescript.javascriptDefaults.addExtraLib(`
+                /**
+                 * @typedef {Object} MyType
+                 * @property {string} name - The name of the person.
+                 * @property {number} age - The age of the person.
+                 */
+            `, '@types/mytypes.d.ts');
 
-    // 添加 JSDoc 类型定义和 Person 类声明
-    monaco.languages.typescript.typescriptDefaults.addExtraLib(`
-      /**
-       * @typedef {Object} Person
-       * @property {string} someProperty - 示例属性
-       * @property {function(): void} someMethod - 示例方法
-       */
-      declare class Person {
-          constructor();
-          someProperty: string;
-          someMethod(): void;
-      }
-    `, 'file:///Person.d.ts');
 
-    // 创建模型
-    const model = monaco.editor.createModel(`
-      /**
-       * @param {Person} p
-       */
-      function test(p) {
-          p.someProperty;
-          p.someMethod();
-      }
-    `, 'typescript', Uri.parse('file:///main.ts'));
+    var jsCode =  `/**
+ * @param {MyType} person - The person object
+ */
+function greet(person) {
+    return 'Hello ' + person.name;
+}`
 
-    // 创建编辑器
-    const editor = monaco.editor.create(this.editorContainer.nativeElement, {
+    const model = monaco.editor.createModel(jsCode, 'typescript', Uri.parse('file:///app.ts'));
+
+
+    monaco.editor.create(this.editorContainer.nativeElement, {
       model: model,
-      language: 'typescript',
-      theme: 'vs-dark',
-      automaticLayout: true
+      language: "typescript",
+      automaticLayout: true,
     });
-    // 还是无法实现
   }
 }

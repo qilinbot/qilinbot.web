@@ -12,6 +12,7 @@ import {NzTooltipDirective} from "ng-zorro-antd/tooltip";
 import {NzCascaderComponent, NzCascaderOption} from "ng-zorro-antd/cascader";
 import {NzOptionComponent, NzSelectComponent} from "ng-zorro-antd/select";
 import {RenderService} from "../../../core/render.service";
+import {HotkeysService} from "../../../services/hotkeys.service";
 
 // 样式重新写 添加日志组件
 
@@ -70,7 +71,7 @@ export class CodeEditorBodyComponent implements AfterViewInit{
   }
 
 
-  constructor(public service: CodeEditorService, public monacoService: MonacoService, private render: RenderService) {
+  constructor(public service: CodeEditorService, public monacoService: MonacoService, private render: RenderService, private hotkeys: HotkeysService) {
     this.service.scriptChannel.subscribe(e => {
       switch (e.type){
         case "openScript":
@@ -83,6 +84,32 @@ export class CodeEditorBodyComponent implements AfterViewInit{
 
   ngAfterViewInit(){
     this.refreshNodes();
+    // 快捷键
+    this.hotkeys
+      .addShortcut({keys: 'meta.s', allowIn: ['INPUT', 'SELECT', 'TEXTAREA', 'CONTENTEDITABLE']})
+      .subscribe(e => {
+        console.log(e)
+        let updateScripts = this.scripts.filter((script) => script.changed && script.editable)
+        if(!updateScripts.length) {
+          this.render.info('无更新')
+          return
+        }
+        let param: any = {};
+
+        updateScripts.forEach((script) => {
+          param[script.id] = this.service.getScriptRequest(script)
+        });
+        console.log(param)
+
+        this.service.updateScripts( param ).subscribe( resp => {
+          this.render.success('保存成功')
+          this.scripts.forEach( script => {
+            script.changed = false;
+          } );
+
+          this.service.scriptChannel.next( { type: 'updateTree', scripts: resp.items } )
+        } );
+      })
   }
 
   /**

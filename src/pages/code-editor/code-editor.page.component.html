@@ -6,7 +6,7 @@
     <as-split-area >
       <as-split unit="percent" [gutterSize]="2"  direction="vertical">
         <as-split-area [size]="70" [minSize]="0" ><app-code-editor-body ></app-code-editor-body></as-split-area>
-        <as-split-area [size]="30" [minSize]="3" ><app-code-editor-log ></app-code-editor-log></as-split-area>
+        <as-split-area #runningLog [size]="30" [minSize]="3" ><app-code-editor-log ></app-code-editor-log></as-split-area>
       </as-split>
     </as-split-area>
   </as-split>

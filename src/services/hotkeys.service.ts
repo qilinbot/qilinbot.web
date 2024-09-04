@@ -79,22 +79,25 @@ interface SequenceSummary {
 
 @Injectable({ providedIn: 'root' })
 export class HotkeysService {
+  constructor(private eventManager: EventManager, @Inject(DOCUMENT) private document: Document) {
+    this.defaults = {
+      trigger: 'keydown',
+      allowIn: [],
+      element: this.document.documentElement,
+      group: undefined,
+      description: undefined,
+      showInHelpMenu: true,
+      preventDefault: true
+    }
+  }
   private readonly hotkeys = new Map<string, Hotkey>();
   private readonly dispose = new Subject<string>();
-  private readonly defaults: Options = {
-    trigger: 'keydown',
-    allowIn: [],
-    element: this.document.documentElement,
-    group: undefined,
-    description: undefined,
-    showInHelpMenu: true,
-    preventDefault: true
-  };
+  private defaults: Options
   private callbacks: HotkeyCallback[] = [];
   private sequenceMaps = new Map<HTMLElement, SequenceSummary>();
   private sequenceDebounce: number = 250;
 
-  constructor(private eventManager: EventManager, @Inject(DOCUMENT) private document: Document) {}
+
 
   getHotkeys(): Hotkey[] {
     const sequenceKeys = Array.from(this.sequenceMaps.values())

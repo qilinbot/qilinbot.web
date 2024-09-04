@@ -21,36 +21,31 @@ import {AppContext} from "../core/const/context.var";
 export class WebsocketService {
   private ws: SocketClient;
   constructor(@Inject(AppContext) public ctx: ContextService,) {
-    console.log(this.ctx.env.websocketHost);
-  }
-
-
-  connect(url: string, cookieId: string, script: MerkabaScript, protocols?: Array<string>, config?: any, binaryType?: BinaryType, ) {
-    this.ws = new SocketClient(this.ctx.env.websocketHost, cookieId, protocols, config, binaryType);
+    // 在service注入的时候初始化
+    this.ws = new SocketClient(this.ctx.env.websocketHost, this.ctx.env.cookieId);
     this.ws.connect();
-  }
+    this.ws.onOpen(res => {
+      this.ws.send({
+        action: 'auth',
+        header:{},
+        body:{}
+      }).subscribe();
+      console.log("send auth socket");
+    });
 
-  onMessage(callback: (message: MessageEvent) => void, options?: any) {
-    this.ws.onMessage(callback, options);
-  }
-
-  send(data: any, binary?: boolean): Observable<any> {
-    return this.ws.sendMessage(data, WebSocketSendMode.Observable, binary);
-  }
-
-  sendDirect(data: any, binary?: boolean): boolean {
-    return this.ws.sendMessage(data, WebSocketSendMode.Direct, binary);
-  }
-
-  close(force: boolean = false, keepReconnectIfNotNormalClose?: boolean) {
-    if (this.ws) {
-      this.ws.close(force, keepReconnectIfNotNormalClose);
-    }
-  }
-
-  onError(callback: (event: ErrorEvent) => void) {
-    this.ws.onError(callback);
+    console.log("websocket service init");
   }
 
 
+  send(message){
+    return this.ws.send(message);
+  }
+  close(){
+    this.ws.close();
+  }
+
+
+  onMessage(callback){
+    return this.ws.onMessage(callback);
+  }
 }
