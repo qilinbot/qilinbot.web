@@ -78,6 +78,23 @@ export class CodeEditorBodyComponent implements AfterViewInit{
           if(e.script.type !== 2) return;
           this.openScriptEditor(e.uri, e.script);
           break;
+
+        case "switchTab":
+          this.openScriptEditor(e.uri, e.script, e.start)
+      }
+    });
+    this.monacoService.scriptChanged.subscribe(res => {
+      switch (res.action){
+        case 'scriptChanged':
+          let changedScript = this.scripts.find((item => item.id === res.scriptId))
+          changedScript.changed = true;
+          changedScript.content = res.content || "";
+          break;
+        case 'scriptSave':
+          let script = this.scripts.find(item => item.id === res.scriptId)
+          this.saveScript(script);
+          break;
+
       }
     })
   }
@@ -112,19 +129,25 @@ export class CodeEditorBodyComponent implements AfterViewInit{
       })
   }
 
+
+  saveScript(script: MerkabaScript){
+    console.log(script, 'save script');
+  }
+
   /**
    * 打开脚本编辑器 创建一个tab
    * @param uri
    * @param data
+   * @param start
    */
-  openScriptEditor(uri: string, data: MerkabaScript): void {
+  openScriptEditor(uri: string, data: MerkabaScript, start?: number): void {
     if(!uri) return;
     console.log(uri);
-    this.prepareRunScriptId = data.id;
+    this.prepareRunScriptId = data.id;  // todo 将来改成不切换的
     this.service.readScript(data.id).subscribe(resp => {
       let script: MerkabaScript = resp as MerkabaScript;
       script.changed = false;
-      script.name = data.name;
+      script.name = resp.name;
       script.vncEnabled = script.vncEnabled || false;
       let index = this.scriptTabs.findIndex(item => item.id === data.id);
       if(index < 0){
@@ -134,42 +157,16 @@ export class CodeEditorBodyComponent implements AfterViewInit{
       this.currentScriptIndex = index;
       if (document.querySelector(`.editor-${script.id} .monaco-editor`)) {
         this.updateInfoOfScript(script)
+        this.monacoService.setCursor(uri, start)
         return;
       }
       setTimeout( async () => {
         let element: any = document.querySelector(`.editor-${script.id}`);
-        this.monacoService.createEditor(script, element);
+        this.monacoService.createEditor(script, element, start);
         this.updateInfoOfScript(script)
       }, 150)
     })
   }
-  // openScriptEditor(data: MerkabaScript): void {
-  //   if(!data.id) return;
-  //   console.log(data);
-  //   this.prepareRunScriptId = data.id;
-  //   this.service.readScript(data.id).subscribe(resp => {
-  //     let script: MerkabaScript = resp as MerkabaScript;
-  //     script.changed = false;
-  //     script.name = data.name;
-  //     script.vncEnabled = script.vncEnabled || false;
-  //     let index = this.scriptTabs.findIndex(item => item.id === data.id);
-  //     if(index < 0){
-  //       this.scriptTabs.push({id: script.id, name: script.name});
-  //       index = this.scripts.push(script) - 1;
-  //     }
-  //     this.currentScriptIndex = index;
-  //     if (document.querySelector(`.editor-${script.id} .monaco-editor`)) {
-  //       this.updateInfoOfScript(script)
-  //       return;
-  //     }
-  //     setTimeout( async () => {
-  //       let element: any = document.querySelector(`.editor-${script.id}`);
-  //       this.monacoService.createEditor(script, element, data.content);
-  //       this.updateInfoOfScript(script)
-  //     }, 150)
-  //   })
-  // }
-
   /**
    * 更新脚本的信息
    * @param script

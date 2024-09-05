@@ -25,6 +25,7 @@
     "@types/jsoneditor": "^9.9.5",
     "angular-split": "^18.0.0-beta.0",
     "buffer": "^6.0.3",
+    "eslint": "^9.9.1",
     "jsoneditor": "^10.1.0",
     "monaco-editor": "^0.50.0",
     "ng-devui": "^17.1.0",

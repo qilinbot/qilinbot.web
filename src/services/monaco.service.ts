@@ -1,11 +1,12 @@
 import { Injectable, NgZone} from '@angular/core';
 import {async, firstValueFrom, map, Subject} from 'rxjs';
-import {editor, languages, Position} from "monaco-editor";
+import {editor, languages, Position, worker} from "monaco-editor";
 import {CodeDeclareService} from "./code-declare.service";
 import {CodeEditorService, IScriptOutLine} from "./code-editor.service";
 import {MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
 import {editorThemeConfig, language} from "../pages/code-editor/const/merkaba.editor.language";
 import * as monaco from 'monaco-editor';
+import ITextModel = editor.ITextModel;
 @Injectable({
   providedIn: 'root'
 })
@@ -39,8 +40,6 @@ export class MonacoService {
     console.log(res);
     this.codeDeclareValue = res.content;
   })
-
-
     this.codeEditorService.scriptChannel.subscribe(res => {
       switch (res.type){
         case 'switchScript':
@@ -68,6 +67,8 @@ export class MonacoService {
         const url = 'file:///' + item.uri + '.js';
         const content: MerkabaScript = await firstValueFrom(this.codeEditorService.readScript(item.id));
         this.models[url] = this.monaco.editor.createModel(content.content, 'javascript', monaco.Uri.parse(url));
+        console.log(content);
+        this.editorScript.set(url, content); // 存储所有的脚本
       }
     });
     await Promise.all(modelPromises);
@@ -98,8 +99,9 @@ export class MonacoService {
    * 创建一个编辑器实例
    * @param script 脚本的内容
    * @param element  挂载的dom元素
+   * @param start
    */
-  public createEditor(script: MerkabaScript, element: any) {
+  public createEditor(script: MerkabaScript, element: any, start?: number) {
     const uri = 'file:///' + script.uri + '.js';
     const model = this.models[uri];
     if (!model) {
@@ -128,26 +130,82 @@ export class MonacoService {
         enabled: false,
       }
     });
-    this.editorMap.set(script.id, editor);
+    this.editorMap.set(uri, editor);
     this.initEditorEvent(editor, script.id);
     this.currentEditor = editor;
+    if(start){
+      this.setCursor(uri, start);
+    }
   }
 
-  initEditorEvent(editor, id){
+  // 唯一的ID
+  initEditorEvent(editor: editor.IStandaloneCodeEditor, scriptId){
+    // 监听编辑器内容的变化 修改当前的changed状态 大纲的时候可以加个防抖 避免多次触发高运算的函数
+    editor.onDidChangeModelContent(res => {
+      this.scriptChanged.next({action: 'scriptChanged', scriptId, content: editor.getValue()})
 
+      // todo 监听并获取大纲的内容
+      // this.getOutline(this.models)；
+    })
+
+    editor.onMouseDown(res => {
+      if((res.event.ctrlKey || res.event.metaKey) && res.target.element.className.includes('mtk')){
+        const position = res.target.position;  // 获取我当前点击的位置
+        if(position){
+          const model: ITextModel = editor.getModel();
+          const word = model.getWordAtPosition(position);
+          if(word){
+            monaco.languages.typescript.getJavaScriptWorker().then(worker => {
+              worker(model.uri).then(client => {
+                const offset = model.getOffsetAt(position);
+                client.getDefinitionAtPosition(model.uri.toString(), offset).then(result => {
+                  console.log(result[0].containerName, result[0].fileName, result);
+                  let uri = result[0].fileName;
+                  let start = result[0].textSpan.start;
+                  console.log(this.editorScript.get(uri))
+                  this.codeEditorService.scriptChannel.next({type: 'switchTab', uri, script: this.editorScript.get(uri), start})
+                })
+              })
+            })
+          }
+        }
+      }
+    })
   }
 
   private initCustomerKey() {
     monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
       module: this.monaco.languages.typescript.ModuleKind.ESNext,
       moduleResolution: this.monaco.languages.typescript.ModuleResolutionKind.NodeJs,
-      noSemanticValidation: false,
-      noSyntaxValidation: false,
-      allowJs: true,
-      allowSyntheticDefaultImports: true,
-      allowNonTsExtensions: true,
+      // allowJs: true,
+      // allowSyntheticDefaultImports: true,
+      // allowNonTsExtensions: true,
     });
 
     monaco.languages.typescript.javascriptDefaults.addExtraLib(this.codeDeclareValue, 'filename/merkaba.d.ts');
+  }
+
+  getOutline(model: monaco.editor.ITextModel) {
+    monaco.languages.typescript.getTypeScriptWorker().then(worker => {
+      worker(model.uri).then((client: any) => {
+        client.getNavigationTree(model.uri.toString()).then((tree: any) => {
+          console.log(tree);  // 打印出当前文件的代码结构树
+        });
+      });
+    }).catch(error => {
+      console.error('Error getting TypeScript worker:', error);
+    });
+  }
+
+
+  setCursor(uri, start){
+    console.log(this.models[uri])
+    const model = this.models[uri];
+    if(model){
+      const position = model.getPositionAt(start);
+      console.log(position)
+      this.editorMap.get(uri).setPosition(position);
+      this.editorMap.get(uri).revealPositionInCenter(position);
+    }
   }
 }
