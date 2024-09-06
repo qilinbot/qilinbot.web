@@ -1,10 +1,9 @@
-import { Injectable, NgZone} from '@angular/core';
-import {async, firstValueFrom, map, Subject} from 'rxjs';
-import {editor, languages, Position, worker} from "monaco-editor";
+import { Injectable} from '@angular/core';
+import {BehaviorSubject, firstValueFrom, Subject} from 'rxjs';
+import {editor} from "monaco-editor";
 import {CodeDeclareService} from "./code-declare.service";
-import {CodeEditorService, IScriptOutLine} from "./code-editor.service";
+import {CodeEditorService} from "./code-editor.service";
 import {MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
-import {editorThemeConfig, language} from "../pages/code-editor/const/merkaba.editor.language";
 import * as monaco from 'monaco-editor';
 import ITextModel = editor.ITextModel;
 @Injectable({
@@ -12,6 +11,8 @@ import ITextModel = editor.ITextModel;
 })
 export class MonacoService {
   monaco = monaco;
+
+  scriptInitLoaded = new BehaviorSubject<boolean>(false);
   /**
    * 脚本内容的变化 todo 具体用来干什么的
    */
@@ -20,7 +21,7 @@ export class MonacoService {
    * 保存所有编辑器实例
    */
   public editorMap: Map<string, editor.IStandaloneCodeEditor > = new Map<string, editor.IStandaloneCodeEditor>();
-  // 保存所有的脚本文件 uri -》 merkabascript
+  // 保存所有的脚本文件 uri -> merkabascript
   public editorScript: Map<string, MerkabaScript> = new Map<string, MerkabaScript>();
 
   // 当个应用的文件模型
@@ -206,6 +207,7 @@ export class MonacoService {
       console.log(position)
       this.editorMap.get(uri).setPosition(position);
       this.editorMap.get(uri).revealPositionInCenter(position);
+      console.log('切换定位成功！')
     }
   }
 }

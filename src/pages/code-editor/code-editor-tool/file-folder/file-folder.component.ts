@@ -113,12 +113,11 @@ export class FileFolderComponent {
   dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
   constructor(private service: CodeEditorService, private dialogService: DialogService, private render: RenderService, private monaco: MonacoService) {
     this.service.load({}).subscribe(resp => {
-      // tood 初始化monaco的所有模块
-      this.monaco.initModels(resp.items);
+      // todo 初始化monaco的所有模块 改成按需加载
+      this.monaco.initModels(resp.items).then(r => this.monaco.scriptInitLoaded.next(true));
       this.fileData = resp.items;
       this.dataSource.setData(resp.items);
     })
-
   }
 
   hasChild = (_: number, node: FlatNode): boolean => node.expandable;

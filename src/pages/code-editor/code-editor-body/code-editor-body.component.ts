@@ -70,7 +70,7 @@ export class CodeEditorBodyComponent implements AfterViewInit{
     return this.scripts[this.currentScriptIndex]
   }
 
-
+  // todo 判断当前是否打开 打开了 则不创建而是
   constructor(public service: CodeEditorService, public monacoService: MonacoService, private render: RenderService, private hotkeys: HotkeysService) {
     this.service.scriptChannel.subscribe(e => {
       switch (e.type){
@@ -157,6 +157,7 @@ export class CodeEditorBodyComponent implements AfterViewInit{
       this.currentScriptIndex = index;
       if (document.querySelector(`.editor-${script.id} .monaco-editor`)) {
         this.updateInfoOfScript(script)
+        console.log("已经存在")
         this.monacoService.setCursor(uri, start)
         return;
       }
