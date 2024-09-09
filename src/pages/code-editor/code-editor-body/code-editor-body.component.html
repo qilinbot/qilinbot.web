@@ -1,4 +1,5 @@
 <div class="merkaba-scripts-wrapper">
+<!--  一排按钮-->
   <div class="merkaba-script-btns">
     <span (click)="enabledVNC = !enabledVNC" class="merkaba-script-btn-vnc" *ngIf="currentScript">
 <!--      <em>vnc</em>-->
@@ -56,7 +57,7 @@
     nzType="editable-card"
     (nzAdd)="newTab()"
     (nzClose)="closeTab($event)"
-    style="height: 100%; width: 100%;"
+    style="height: calc(100% - 36px); width: 100%;"
   >
     @for (tab of scriptTabs; track tab) {
       <nz-tab nzClosable [nzTitle]="tab.name" style="height: 100%; width: 100%">

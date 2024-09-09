@@ -10,6 +10,10 @@
         height: 100%;
       }
     }
+    .ant-tabs-nav{
+      margin: 0;
+    }
+
     ::ng-deep nz-tab .code{
       height: 100%;
     }

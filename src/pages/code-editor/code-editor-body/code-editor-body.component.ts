@@ -70,7 +70,7 @@ export class CodeEditorBodyComponent implements AfterViewInit{
     return this.scripts[this.currentScriptIndex]
   }
 
-  // todo 判断当前是否打开 打开了 则不创建而是
+  // todo 判断当前是否打开 打开了 则不创建而是直接切换
   constructor(public service: CodeEditorService, public monacoService: MonacoService, private render: RenderService, private hotkeys: HotkeysService) {
     this.service.scriptChannel.subscribe(e => {
       switch (e.type){
@@ -94,7 +94,6 @@ export class CodeEditorBodyComponent implements AfterViewInit{
           let script = this.scripts.find(item => item.id === res.scriptId)
           this.saveScript(script);
           break;
-
       }
     })
   }
