@@ -1,0 +1,38 @@
+<a nz-dropdown [nzClickHide]="false" class="select-node">
+  <div class="location">
+    <span nz-icon nzType="dashboard" class="location-icon"></span>
+    <span>{{ selectedRegion }}</span>
+  </div>
+  <div class="thread"></div>
+  <div>{{ node }}</div>
+  <!-- 点击下拉图标时，调用 toggleDropdownMenu 函数 -->
+  <span nz-icon nzType="down" (click)="toggleDropdownMenu()"></span>
+
+  <ng-container *ngIf="isDropdownVisible">
+    <div class="geo-ip-dashboard">
+      <div class="filter-section">
+        <ng-container *ngFor="let category of selectedCategories">
+          <div class="filter-row">
+            <span class="filter-label">{{ category }}</span>
+            <div class="filter-options-area" [class.show-all]="showMore === category" (click)="select($event)">
+              <ng-container *ngFor="let option of data[category]">
+                <span class="option">{{ option }}</span>
+              </ng-container>
+            </div>
+            <div class="more-toggle" *ngIf="data[category].length > 7">
+              <span class="toggle-more" (click)="toggleMore(category)">
+                {{ showMore === category ? '收起' : '更多' }}
+              </span>
+              <i class="XPA" [ngClass]="showMore === category ? 'xpa-icon' : 'xpa-a-icon1'"></i>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="geo-ip-dashboard_tool"></div>
+      <div class="geo-ip-dashboard__content"></div>
+    </div>
+  </ng-container>
+</a>
+
+

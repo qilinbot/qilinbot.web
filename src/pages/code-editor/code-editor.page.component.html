@@ -1,4 +1,32 @@
 <div class="automated">
+  <div class="header-container">
+    <div class="left-container">
+      <i class="XPA xpa-xiaoyu"></i>
+      <div class="title">JD 京准通数据获取应用</div>
+      <i class="XPA xpa-Title edit-title"></i>
+      <div class="version">V2.10</div>
+    </div>
+    <div class="right-container">
+      <app-geo-ipdashboard></app-geo-ipdashboard>
+      <div class="line"></div>
+      <div class="main-programming" *ngIf="allScripts">
+        <a nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu" style="color: inherit">
+          <ng-template *ngTemplateOutlet="scriptInfo; context: {$implicit: selectedScript}"></ng-template>
+        </a>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+<!--          所有的脚本列表-->
+          <ng-container *ngFor="let script of allScripts">
+            <ng-template *ngTemplateOutlet="scriptInfo; context: {$implicit: script}"></ng-template>
+          </ng-container>
+        </nz-dropdown-menu>
+      </div>
+      <div class="line"></div>
+      <div class="run-script" [ngStyle]="{ 'background-color': isRunning ? '#4caf50' : '#f44336' }">
+        <i class="XPA" [ngClass]="!isRunning? 'xpa-a-yunhangbeifen2' : 'xpa-a-yunhangbeifen2'"></i>
+        <span>{{isRunning? "Run" : "Stop"}}</span>
+      </div>
+    </div>
+  </div>
   <as-split unit="pixel" [gutterSize]="2"  direction="horizontal">
     <as-split-area [size]="420" [minSize]="340" >
         <app-code-editor-tool></app-code-editor-tool>
@@ -24,3 +52,12 @@
     <div class="blob blob-5"></div>
   </div>
 </ng-container>
+
+<ng-template let-script #scriptInfo>
+  <div class="script-info">
+    <span class="script-info-name">{{script.name}}</span>
+    <span class="script-info-dot"></span>
+    <span class="script-info-version">V{{script.version}}</span>
+    <span nz-icon nzType="down"></span>
+  </div>
+</ng-template>

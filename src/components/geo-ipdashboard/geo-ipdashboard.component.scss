@@ -1,0 +1,86 @@
+.select-node{
+  font-family: "PingFang SC";
+  height: 32px;
+  padding: 0 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 4px 4px 0;
+  background: var(----1, #000617);
+  gap: 12px;
+  position: relative;
+  .location{
+    .location-icon{
+      margin-right: 4px;
+    }
+  }
+  .thread{
+    width: 1px;
+    height: 24px;
+    border-radius: 2px;
+    background: var(--, rgba(255, 255, 255, 0.10));
+  }
+}
+
+.geo-ip-dashboard{
+  position: absolute;
+  z-index: 10000;
+  top: 32px;
+  left: 0;
+  width: 584px;
+  font-family: "PingFang SC";
+  background-color: #28344b;
+  color: #D0D1D6;
+  .filter-section{
+    display: flex;
+    flex-direction: column;
+    .filter-row{
+      display: flex;
+      flex-direction: row;
+      .filter-label{
+        color: #899DB7;
+        width: 80px;
+        line-height: 48px;
+      }
+      // 加边框
+      .filter-options-area{
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        max-height: 48px; /* 根据一行的高度来设置 */
+        overflow: hidden; /* 超出部分隐藏 */
+        transition: max-height 0.3s ease-in-out;
+        gap: 4px;
+        .option{
+          text-align: center;
+          width: 56px;
+          height: 48px;
+          line-height: 48px;
+          :hover{
+            border: 1px solid lightblue;
+
+          }
+        }
+      }
+
+      .filter-options-area.show-all {
+        max-height: none; /* 当点击“更多”时，显示全部行 */
+      }
+
+      .more-toggle{
+        width: 80px;
+        color: #899DB7;
+        line-height: 48px;
+      }
+    }
+  }
+
+}
+
+.active{
+  width: 56px;
+  color: #FF8F3D;
+  border-radius: 24px;
+  border: 1px solid #FF8F3D;
+}

@@ -1,139 +1,102 @@
 @import "src/assets/iconfont/iconfont.css";
-* {
-  font-family: PingFangSC-Regular, PingFang SC;
-  margin: 0;
-  padding: 0;
-}
-::ng-deep :root {
-  --merkaba-menu-hover-color: #eee;
-  --theme-tool-header: #eee;
-  --theme-log-background-color:#fff;
-}
-@media (prefers-color-scheme: dark) {
-  ::ng-deep :root {
-    --theme-minor-text-color: #c8c8c8;
-    --theme-header-text-color: #c8c8c8;
-    --theme-border-color: rgb(97, 97, 97);
-    --theme-tool-header: #454b59;
-    --merkaba-menu-hover-color: #454b59;
-    --theme-select-bg-color: #2c385a;
-    --theme-background-color: rgb(36, 42, 48);
-    --theme-log-background-color: #121212;
-  }
-}
-@mixin radius-icon() {
-  border-radius: 5px;
-  text-align: center;
-}
-//  头部btn
-@mixin headerBtn() {
-  display: inline-block;
-  height: 30px;
-  color: #595757;
-  cursor: pointer;
-  text-align: center;
-  line-height: 30px;
-  border: 1px solid transparent;
-  margin-right: 20px;
-  i {
-    margin-right: 2px;
-    font-size: 12px;
-  }
-}
-@mixin btnIcon() {
-  border: 1px solid #E9E9EA;
-  border-radius: 5px;
-}
-@mixin reset() {
-  background: transparent;
-  margin: 0 ;
-  border: 0;
-  transition: none;
-}
-@mixin btnCommon($width, $height, $bgColor: inherit,$color: inherit) {
-  position: absolute;
-  top: 50%;
-  width: $width;
-  height: $height;
-  line-height: $height;
-  background-color: $bgColor;
-  color: $color;
-}
-
 .automated{
   height: 100%;
   width: 100%;
+  background-color: #121b32;
+  color: #E6E6E6;
+  font-family: "PingFang SC", serif;
+  font-size: 16px;
+  font-weight: normal;
+
+  .header-container{
+    height: 74px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    //line-height: 74px;
+    .left-container{
+      margin-left: 32px;
+      display: flex;
+      flex-direction: row;
+      justify-content: left;
+      align-items: center;
+      gap: 10px;
+
+      .edit-title{
+        color: #FF9900;
+      }
+
+      .version{
+        font-size: 12px;
+        width: 47px;
+        height: 24px;
+        border-radius: 4px;
+        padding: 3px 8px;
+        border: 1px solid rgba(255, 255, 255, 0.20);
+      }
+    }
+
+    .right-container{
+      display: flex;
+      justify-content: right;
+      align-items: center;
+      gap: 20px;
+
+      .main-programming{
+        height: 32px;
+        width: 159px;
+        padding: 0 12px;
+        border-radius: 4px;
+        line-height: 32px;
+        background: var(---, #288AD3);
+        color: var(---1, #EBECEF);
+
+      }
+
+      .line{
+        width: 1px;
+        height: 24px;
+        border-radius: 2px;
+        background: var(--, rgba(255, 255, 255, 0.10));
+      }
+
+      .run-script{
+        cursor: pointer;
+        width: 84px;
+        height: 32px;
+        padding: 0 8px;
+        margin-right: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        border-radius: 4px;
+        background: var(---, #3D4A66);
+      }
+
+      .stop-script{
+        cursor: pointer;
+        width: 84px;
+        height: 32px;
+        padding: 0 8px;
+        margin-right: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        border-radius: 4px;
+        background: var(---, #3D4A66);
+      }
+    }
+  }
 
 }
 
+.script-info{
+  display: flex;
+  gap: 8px;
 
-@-webkit-keyframes spin {
-  0% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
-@-moz-keyframes spin {
-  0% {
-    -moz-transform: rotate(0);
-  }
-  100% {
-    -moz-transform: rotate(360deg);
-  }
-}
-@keyframes spin {
-  0% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-.spinner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1003;
-  background: #000000;
-  overflow: hidden;
-}
-.spinner div:first-child {
-  display: block;
-  position: relative;
-  left: 50%;
-  top: 50%;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  border-radius: 50%;
-  box-shadow: 0 3px 3px 0 rgba(255, 56, 106, 1);
-  transform: translate3d(0, 0, 0);
-  animation: spin 2s linear infinite;
-}
-.spinner div:first-child:after,
-.spinner div:first-child:before {
-  content: '';
-  position: absolute;
-  border-radius: 50%;
-}
-.spinner div:first-child:before {
-  top: 5px;
-  left: 5px;
-  right: 5px;
-  bottom: 5px;
-  box-shadow: 0 3px 3px 0 rgb(255, 228, 32);
-  -webkit-animation: spin 3s linear infinite;
-  animation: spin 3s linear infinite;
-}
-.spinner div:first-child:after {
-  top: 15px;
-  left: 15px;
-  right: 15px;
-  bottom: 15px;
-  box-shadow: 0 3px 3px 0 rgba(61, 175, 255, 1);
-  animation: spin 1.5s linear infinite;
-}
+
