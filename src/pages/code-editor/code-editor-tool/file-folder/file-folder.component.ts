@@ -22,13 +22,10 @@ import {NzColDirective, NzRowDirective} from "ng-zorro-antd/grid";
 import {NzSelectComponent, NzSelectModule} from "ng-zorro-antd/select";
 import {NzDatePickerComponent} from "ng-zorro-antd/date-picker";
 import {NzButtonComponent} from "ng-zorro-antd/button";
-import {DialogService} from "ng-devui";
-import {FileEditModalComponent} from "../file-edit-modal/file-edit-modal.component";
 import {RenderService} from "../../../../core/render.service";
 import {NzTooltipDirective} from "ng-zorro-antd/tooltip";
 import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
 import {MonacoService} from "../../../../services/monaco.service";
-import {FocusKeyManager} from "@angular/cdk/a11y";
 
 export enum EIconType {
   'xpa-wangzhan',
@@ -111,7 +108,7 @@ export class FileFolderComponent {
     node => node.children
   );
   dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
-  constructor(private service: CodeEditorService, private dialogService: DialogService, private render: RenderService, private monaco: MonacoService) {
+  constructor(private service: CodeEditorService, private render: RenderService, private monaco: MonacoService) {
     this.service.load({}).subscribe(resp => {
       // todo 初始化monaco的所有模块 改成按需加载
       this.monaco.initModels(resp.items).then(r => this.monaco.scriptInitLoaded.next(true));
@@ -160,7 +157,7 @@ export class FileFolderComponent {
     let parentRecord = this.selectListSelection.selected
     let parentId = parseParentId(selectedNode[0]);
     let newFile: MerkabaRecord = {parentId, id: '', name: '', parentRecord: getRecord(parentRecord[0])}
-    this.updateFile(newFile, false, 'add');
+    // this.updateFile(newFile, false, 'add');
   }
 
   /**
@@ -264,50 +261,9 @@ export class FileFolderComponent {
    * @param isEdit
    * @param type
    */
-  updateFile(data: MerkabaRecord, isEdit: boolean = false, type: 'add' | 'modify') {
-    const results = this.dialogService.open({
-      id: 'dialog-service',
-      width: '500px',
-      maxHeight: '500px',
-      title: '新建文件',
-      content: FileEditModalComponent,
-      dialogtype: 'standard',
-      // beforeHidden: () => this.beforeHidden(),
-      backdropCloseable: true,
-      buttons: [
-        {
-          cssClass: 'common',
-          text: '取消',
-          handler: ($event: Event) => {
-            results.modalInstance.hide();
-          },
-        },
-        {
-          cssClass: 'primary',
-          text: '保存',
-          handler: ($event: Event) => {
-            // todo handler 要根据传入的是编辑还是增加去分别操作 有修改操作再补
-            const fileEditModalInstance = results.modalContentInstance as FileEditModalComponent
-            fileEditModalInstance.updateEditRecord().then(resp => {
-              if(resp.isSuccess){
-                delete resp.isSuccess;
-                Object.assign(data, resp);
-                if (data.parentRecord) {
-                  data.parentRecord.children.push(data);
-                } else {
-                  this.fileData.push(data);
-                }
-                console.log(data)
-                this.dataSource.setData(this.fileData);
-                results.modalInstance.hide();
-              }
-            })
-          },
-        },
-      ],
-    });
-    const fileEditModalInstance = results.modalContentInstance as FileEditModalComponent;
-    fileEditModalInstance.initData(data);
-  }
+  // updateFile(data: MerkabaRecord, isEdit: boolean = false, type: 'add' | 'modify') {
+  //   const fileEditModalInstance = results.modalContentInstance as FileEditModalComponent;
+  //   fileEditModalInstance.initData(data);
+  // }
 
 }

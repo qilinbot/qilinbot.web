@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input} from '@angular/core';
+import {AfterViewInit, Component, ElementRef, HostListener, Input} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {NzDropDownModule} from "ng-zorro-antd/dropdown";
 import {NzIconDirective} from "ng-zorro-antd/icon";
@@ -18,6 +18,12 @@ const selectedCategories = ["regions", "platforms", "categories"];
   styleUrl: './geo-ipdashboard.component.scss'
 })
 export class GeoIPDashboardComponent {
+  selectedCategoriesLabel = {
+    regions: "地区",
+    platforms: "平台",
+    categories: "类别"
+  }
+
   @Input() data: any = staticData;
   selectedRegion: Option
   selectedPlatform: Option
@@ -28,6 +34,13 @@ export class GeoIPDashboardComponent {
   showMore: string
   // 判断菜单是否出现
   isDropdownVisible: boolean = false; // 初始情况下，菜单隐藏
+
+  usableNode
+  nodeCount: number = 0;
+
+  constructor(private eRef: ElementRef){
+
+  }
 
   /**
    * 展示更多详情
@@ -48,7 +61,9 @@ export class GeoIPDashboardComponent {
       for(let i = 0; i < elements.children.length; i++){
         elements.children[i].classList.remove('active')
       }
-      e.target.classList.add('active')
+      e.target.classList.add('active');
+
+      // todo 调用接口返回所有的node信息 并更新
     }
   }
 
@@ -73,6 +88,13 @@ export class GeoIPDashboardComponent {
     }, 0);
   }
 
+  // 监听全局点击事件
+  @HostListener('document:click', ['$event'])
+  clickOutside(event: Event): void {
+    if (this.isDropdownVisible && !this.eRef.nativeElement.contains(event.target)) {
+      this.isDropdownVisible = false; // 点击下拉框以外的区域时隐藏菜单
+    }
+  }
 
   protected readonly selectedCategories = selectedCategories;
 }

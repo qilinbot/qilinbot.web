@@ -16,6 +16,8 @@ import {MerkabaScript} from "./const/code-editor.page.const";
 import {GeoIPDashboardComponent} from "../../components/geo-ipdashboard/geo-ipdashboard.component";
 import {NzDropDownADirective, NzDropDownDirective, NzDropdownMenuComponent} from "ng-zorro-antd/dropdown";
 import {NzIconDirective} from "ng-zorro-antd/icon";
+import {NzMenuDirective, NzMenuDividerDirective, NzMenuItemComponent, NzSubMenuComponent} from "ng-zorro-antd/menu";
+import {SelectComponent} from "../../components/select/select.component";
 
 @Component({
   selector: 'app-code-editor.page',
@@ -44,7 +46,12 @@ import {NzIconDirective} from "ng-zorro-antd/icon";
     NzIconDirective,
     NgTemplateOutlet,
     NgClass,
-    NgStyle
+    NgStyle,
+    NzMenuDirective,
+    NzMenuItemComponent,
+    NzSubMenuComponent,
+    NzMenuDividerDirective,
+    SelectComponent
   ],
   templateUrl: './code-editor.page.component.html',
   styleUrl: './code-editor.page.component.scss'
@@ -67,6 +74,14 @@ export class CodeEditorPageComponent implements OnDestroy {
     proxy: '12'
   };
 
+  options = [
+    { value: 'man.js V1.28', name: 'man.js', version: 'V1.28' },
+    { value: 'lucy', name: 'Lucy', version: 'V1.0' },
+    { value: 'disabled', name: 'Disabled', version: 'V1.0', disabled: true }
+  ];
+
+  selectedOption = this.options[0];  // 绑定整个对象，初始状态为空
+
 
   allScripts: MerkabaScript[];
 
@@ -80,6 +95,11 @@ export class CodeEditorPageComponent implements OnDestroy {
       console.log(this.loaded)
     })
 
+  }
+
+  runScriptChange(e){
+    // todo 获取当前选中要运行的脚本
+    console.log(e);
   }
 
   ngOnDestroy(): void {

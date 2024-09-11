@@ -124,6 +124,7 @@ export class MonacoService {
       fontSize: 16,
       lineHeight: 30,
       suggestFontSize: 16,
+      theme: 'vs',
       // theme: media.matches ? 'myCustom-theme-dark' :'myCustom-theme',
       formatOnPaste: true,
       glyphMargin: true,

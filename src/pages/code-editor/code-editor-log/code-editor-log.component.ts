@@ -1,5 +1,4 @@
 import {ChangeDetectorRef, Component, ViewChild} from '@angular/core';
-import {SearchModule} from "ng-devui";
 import {VirtualScrollerComponent} from "../../../components/virtual-scroller/virtual-scroller.component";
 import {NgxJsonViewerModule} from "ngx-json-viewer";
 import {CommonModule} from "@angular/common";
@@ -14,7 +13,6 @@ import {MerkabaScript} from "../const/code-editor.page.const";
   selector: 'app-code-editor-log',
   standalone: true,
   imports: [
-    SearchModule,
     VirtualScrollerComponent,
     NgxJsonViewerModule,
     CommonModule,
@@ -26,7 +24,7 @@ import {MerkabaScript} from "../const/code-editor.page.const";
   styleUrl: './code-editor-log.component.scss'
 })
 export class CodeEditorLogComponent {
-  @ViewChild('scrollLogs', {static: false}) scrollLogs: VirtualScrollerComponent;
+  // @ViewChild('scrollLogs', {static: false}) scrollLogs: VirtualScrollerComponent;
   // 用于记录所有连接所创建的实例
   protected busInstances: Map<string, {infos: Array<any>, instance?: any}> = new Map();
 
@@ -92,11 +90,11 @@ export class CodeEditorLogComponent {
     console.log(term);
   }
 
-  scrollInto(info) {
-    this.scrollLogs.scrollInto(info);
-  }
-
-  scrollIntoIndex(index: number) {
-    this.scrollLogs.scrollToIndex(index);
-  }
+  // scrollInto(info) {
+  //   this.scrollLogs.scrollInto(info);
+  // }
+  //
+  // scrollIntoIndex(index: number) {
+  //   this.scrollLogs.scrollToIndex(index);
+  // }
 }

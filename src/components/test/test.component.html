@@ -1,1 +1,15 @@
-<app-geo-ipdashboard></app-geo-ipdashboard>
+<app-select
+  [options]="options"
+  [(selectedOption)]="selectedOption"
+  [placeholder]="'请选择运行的脚本'"
+  [customSelectedOptionTemplate]="defaultTemplate"
+  [customOptionTemplate]="optionTemplate"
+></app-select>
+
+<ng-template #defaultTemplate let-selected>
+  <span>{{ selected.name }}</span> • <span>{{ selected.version }}</span>
+</ng-template>
+
+<ng-template #optionTemplate let-selected>
+  <div>{{selected.name + '*' + selected.version}}</div>
+</ng-template>

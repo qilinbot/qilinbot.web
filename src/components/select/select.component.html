@@ -1,0 +1,32 @@
+<div class="select" (click)="toggleDropdown()">
+  <div class="select-selection">
+    <ng-container *ngIf="selectedOption; else placeholderTemplate">
+      <ng-container *ngIf="customSelectedOptionTemplate; else defaultTemplate" [ngTemplateOutlet]="customSelectedOptionTemplate" [ngTemplateOutletContext]="{ $implicit: selectedOption }"></ng-container>
+    </ng-container>
+
+    <ng-template #placeholderTemplate>
+      <span class="nz-select-placeholder">{{ placeholder }}</span>
+    </ng-template>
+
+    <ng-template #defaultTemplate let-selected>
+      <span>{{ selected.name }} • {{ selected.version }}</span>
+    </ng-template>
+  </div>
+
+  <div class="select-dropdown" *ngIf="isDropdownOpen">
+    <ng-container *ngIf="customOptionTemplate; else defaultOption" >
+      <ng-container *ngFor="let option of options">
+        <div (click)="selectOption(option, $event)" class="option" [ngClass]="{'selected': selectedOption?.name === option.name}">
+          <ng-container *ngTemplateOutlet="customOptionTemplate;context: {$implicit: option}" ></ng-container>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
+
+
+<ng-template #defaultOption>
+  <ng-container *ngFor="let option of options" >
+    <div class="option" (click)="selectOption(option, $event)" [ngClass]="{'selected': selectedOption?.name === option.name}">{{ option }}</div>
+  </ng-container>
+</ng-template>

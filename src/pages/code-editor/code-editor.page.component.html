@@ -10,31 +10,48 @@
       <app-geo-ipdashboard></app-geo-ipdashboard>
       <div class="line"></div>
       <div class="main-programming" *ngIf="allScripts">
-        <a nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu" style="color: inherit">
-          <ng-template *ngTemplateOutlet="scriptInfo; context: {$implicit: selectedScript}"></ng-template>
-        </a>
-        <nz-dropdown-menu #menu="nzDropdownMenu">
-<!--          所有的脚本列表-->
-          <ng-container *ngFor="let script of allScripts">
-            <ng-template *ngTemplateOutlet="scriptInfo; context: {$implicit: script}"></ng-template>
-          </ng-container>
-        </nz-dropdown-menu>
+        <app-select
+          [options]="options"
+          [(selectedOption)]="selectedOption"
+          [placeholder]="'请选择运行的脚本'"
+          [customSelectedOptionTemplate]="selectedTemplate"
+          [customOptionTemplate]="optionTemplate"
+          (selectedOptionChange)="runScriptChange($event)"
+        ></app-select>
+
+        <ng-template #selectedTemplate let-selected>
+          <div class="selected-option">
+            <span class="selected-name">{{ selected.name }}</span> <span class="dot-version">{{ '• ' +  selected.version }}</span>
+            <i class="XPA xpa-shaixuankuang-xiala-xuanzhong"></i>
+          </div>
+        </ng-template>
+
+        <ng-template #optionTemplate let-selected>
+          <div class="selected-option">
+            <span class="selected-name">{{ selected.name }}</span> <span class="dot-version">{{ '• ' +  selected.version }}</span>
+          </div>
+        </ng-template>
       </div>
       <div class="line"></div>
-      <div class="run-script" [ngStyle]="{ 'background-color': isRunning ? '#4caf50' : '#f44336' }">
+      <div class="run-script"
+           [ngStyle]="{ 'background-color': isRunning ? 'linear-gradient(94deg, #FF985F 0%, #C5434F 100%)' : '#3c4a65' }">
         <i class="XPA" [ngClass]="!isRunning? 'xpa-a-yunhangbeifen2' : 'xpa-a-yunhangbeifen2'"></i>
-        <span>{{isRunning? "Run" : "Stop"}}</span>
+        <span>{{ isRunning ? "Stop" : "Run" }}</span>
       </div>
     </div>
   </div>
-  <as-split unit="pixel" [gutterSize]="2"  direction="horizontal">
-    <as-split-area [size]="420" [minSize]="340" >
-        <app-code-editor-tool></app-code-editor-tool>
+  <as-split unit="pixel" [gutterSize]="2" direction="horizontal">
+    <as-split-area [size]="420" [minSize]="340">
+      <app-code-editor-tool></app-code-editor-tool>
     </as-split-area>
-    <as-split-area >
-      <as-split unit="percent" [gutterSize]="2"  direction="vertical">
-        <as-split-area [size]="70" [minSize]="0" ><app-code-editor-body ></app-code-editor-body></as-split-area>
-        <as-split-area #runningLog [size]="30" [minSize]="3" ><app-code-editor-log ></app-code-editor-log></as-split-area>
+    <as-split-area>
+      <as-split unit="percent" [gutterSize]="2" direction="vertical">
+        <as-split-area [size]="70" [minSize]="0">
+          <app-code-editor-body></app-code-editor-body>
+        </as-split-area>
+        <as-split-area #runningLog [size]="30" [minSize]="3">
+          <app-code-editor-log></app-code-editor-log>
+        </as-split-area>
       </as-split>
     </as-split-area>
   </as-split>
@@ -42,7 +59,83 @@
 
 
 <ng-container *ngIf="!loaded">
-  <style>@-webkit-keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@-moz-keyframes spin{0%{-moz-transform:rotate(0)}100%{-moz-transform:rotate(360deg)}}@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}.spinner{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1003;background: #000000;overflow:hidden}  .spinner div:first-child{display:block;position:relative;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;box-shadow:0 3px 3px 0 rgba(255,56,106,1);transform:translate3d(0,0,0);animation:spin 2s linear infinite}  .spinner div:first-child:after,.spinner div:first-child:before{content:'';position:absolute;border-radius:50%}  .spinner div:first-child:before{top:5px;left:5px;right:5px;bottom:5px;box-shadow:0 3px 3px 0 rgb(255, 228, 32);-webkit-animation:spin 3s linear infinite;animation:spin 3s linear infinite}  .spinner div:first-child:after{top:15px;left:15px;right:15px;bottom:15px;box-shadow:0 3px 3px 0 rgba(61, 175, 255,1);animation:spin 1.5s linear infinite}</style>
+  <style>@-webkit-keyframes spin {
+    0% {
+      transform: rotate(0)
+    }
+
+    100% {
+      transform: rotate(360deg)
+    }
+  }
+
+  @-moz-keyframes spin {
+    0% {
+      -moz-transform: rotate(0)
+    }
+    100% {
+      -moz-transform: rotate(360deg)
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0)
+    }
+    100% {
+      transform: rotate(360deg)
+    }
+  }
+
+  .spinner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1003;
+    background: #000000;
+    overflow: hidden
+  }
+
+  .spinner div:first-child {
+    display: block;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    border-radius: 50%;
+    box-shadow: 0 3px 3px 0 rgba(255, 56, 106, 1);
+    transform: translate3d(0, 0, 0);
+    animation: spin 2s linear infinite
+  }
+
+  .spinner div:first-child:after, .spinner div:first-child:before {
+    content: '';
+    position: absolute;
+    border-radius: 50%
+  }
+
+  .spinner div:first-child:before {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    box-shadow: 0 3px 3px 0 rgb(255, 228, 32);
+    -webkit-animation: spin 3s linear infinite;
+    animation: spin 3s linear infinite
+  }
+
+  .spinner div:first-child:after {
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    box-shadow: 0 3px 3px 0 rgba(61, 175, 255, 1);
+    animation: spin 1.5s linear infinite
+  }</style>
   <div id="nb-global-spinner" class="spinner">
     <div class="blob blob-0"></div>
     <div class="blob blob-1"></div>
@@ -55,9 +148,9 @@
 
 <ng-template let-script #scriptInfo>
   <div class="script-info">
-    <span class="script-info-name">{{script.name}}</span>
+    <span class="script-info-name">{{ script.name }}</span>
     <span class="script-info-dot"></span>
-    <span class="script-info-version">V{{script.version}}</span>
+    <span class="script-info-version">V{{ script.version }}</span>
     <span nz-icon nzType="down"></span>
   </div>
 </ng-template>
