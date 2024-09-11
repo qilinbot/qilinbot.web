@@ -16,8 +16,6 @@ import {LoginWebGuard} from "../Guard/login.web.guard";
 import {UserService} from "../services/user.service";
 import {routes} from "./app.routes";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {DialogService, DocumentRef} from "ng-devui";
-import {OverlayContainerRef} from "ng-devui/overlay-container";
 
 
 export function initializeApp() {
@@ -55,9 +53,6 @@ export const appConfig = {
     UserService,
     AuthWebGuard,
     LoginWebGuard,
-    DialogService,
-    OverlayContainerRef,
-    DocumentRef,
     provideHttpClient(),
     {
       provide: APP_INITIALIZER,

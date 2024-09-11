@@ -9,6 +9,7 @@ import {NzButtonComponent} from "ng-zorro-antd/button";
 import {NzDrawerComponent} from "ng-zorro-antd/drawer";
 import {NzIconDirective} from "ng-zorro-antd/icon";
 import {NzInputDirective, NzInputGroupComponent} from "ng-zorro-antd/input";
+import {MatTab, MatTabGroup} from "@angular/material/tabs";
 @Component({
   selector: 'app-code-editor-tool',
   standalone: true,
@@ -25,6 +26,8 @@ import {NzInputDirective, NzInputGroupComponent} from "ng-zorro-antd/input";
     NzIconDirective,
     NzInputDirective,
     NzInputGroupComponent,
+    MatTab,
+    MatTabGroup,
   ],
   templateUrl: './code-editor-tool.component.html',
   styleUrl: './code-editor-tool.component.scss'

@@ -24,6 +24,7 @@
 }
 
 .geo-ip-dashboard{
+  border-radius: 3px;
   position: absolute;
   z-index: 10000;
   top: 32px;
@@ -36,14 +37,18 @@
     display: flex;
     flex-direction: column;
     .filter-row{
+      font-size: 14px;
       display: flex;
       flex-direction: row;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       .filter-label{
         color: #899DB7;
         width: 80px;
         line-height: 48px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 11px 16px;
       }
-      // 加边框
       .filter-options-area{
         flex: 1;
         display: grid;
@@ -57,13 +62,12 @@
           width: 56px;
           height: 48px;
           line-height: 48px;
-          :hover{
-            border: 1px solid lightblue;
-
-          }
+        }
+        .option:hover{
+          cursor: pointer;
+          background: rgba(255, 255, 255, 0.10);
         }
       }
-
       .filter-options-area.show-all {
         max-height: none; /* 当点击“更多”时，显示全部行 */
       }
@@ -73,6 +77,51 @@
         color: #899DB7;
         line-height: 48px;
       }
+    }
+  }
+
+  .geo-ip-dashboard_tool{
+    height: 64px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(----5, #1F283F);
+    gap: 16px;
+    .sousuo input{
+      background-color: #1f283e;
+      border: none;
+      outline: none;
+    }
+    .sousuo input:focus{
+      outline: 1px solid lightblue;
+    }
+
+    .refresh-node{
+      height: 32px;
+      width: 108px;
+      border-radius: 4px;
+      background: var(---, #3D4A66);
+      padding: 0 12px 0 4px;
+      text-align: center;
+      line-height: 32px;
+    }
+  }
+  .geo-ip-dashboard__content{
+    padding: 16px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .node-item{
+      height: 40px;
+      padding: 0 24px;
+      font-size: 14px;
+      color: var(---2, #D0D1D6);
+      font-weight: 400;
+      line-height: 40px;
     }
   }
 

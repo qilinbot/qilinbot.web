@@ -1,5 +1,4 @@
 import {AfterViewInit, Component} from '@angular/core';
-import {TabsModule} from "ng-devui";
 import {CommonModule, NgClass, NgForOf, NgStyle} from "@angular/common";
 import {NzTabComponent, NzTabSetComponent} from "ng-zorro-antd/tabs";
 import {CodeEditorService} from "../../../services/code-editor.service";
@@ -20,7 +19,6 @@ import {HotkeysService} from "../../../services/hotkeys.service";
   selector: 'app-code-editor-body',
   standalone: true,
   imports: [
-    TabsModule,
     NgForOf,
     NzTabSetComponent,
     NzTabComponent,

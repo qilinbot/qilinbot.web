@@ -1,4 +1,4 @@
-<a nz-dropdown [nzClickHide]="false" class="select-node">
+<a nz-dropdown [nzClickHide]="true" class="select-node">
   <div class="location">
     <span nz-icon nzType="dashboard" class="location-icon"></span>
     <span>{{ selectedRegion }}</span>
@@ -13,7 +13,7 @@
       <div class="filter-section">
         <ng-container *ngFor="let category of selectedCategories">
           <div class="filter-row">
-            <span class="filter-label">{{ category }}</span>
+            <span class="filter-label">{{ selectedCategoriesLabel[category] }}</span>
             <div class="filter-options-area" [class.show-all]="showMore === category" (click)="select($event)">
               <ng-container *ngFor="let option of data[category]">
                 <span class="option">{{ option }}</span>
@@ -30,9 +30,15 @@
       </div>
 
       <div class="geo-ip-dashboard_tool">
-        
+        <div class="sousuo"><i class="XPA sousuo"></i><input type="text" placeholder="搜索关键字"></div>
+        <div>共{{nodeCount}}个结点</div>
+        <div class="refresh-node"><i class="XPA chedan1"></i> <span>刷新节点</span></div>
       </div>
-      <div class="geo-ip-dashboard__content"></div>
+      <div class="geo-ip-dashboard__content">
+        <ng-container *ngFor="let item of usableNode">
+          <div class="node-item">{{item}}</div>
+        </ng-container>
+      </div>
     </div>
   </ng-container>
 </a>
