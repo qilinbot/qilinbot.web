@@ -1,7 +1,7 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, TemplateRef, ViewChild} from '@angular/core';
 import {SplitAreaComponent, SplitComponent} from "angular-split";
 import {ITool, tools} from "./tools.const";
-import {NgClass, NgForOf, NgIf} from "@angular/common";
+import {NgClass, NgForOf, NgIf, NgTemplateOutlet} from "@angular/common";
 import {CodeEditorService} from "../../../services/code-editor.service";
 import {NzTreeViewModule} from "ng-zorro-antd/tree-view";
 import {FileFolderComponent} from "./file-folder/file-folder.component";
@@ -9,7 +9,12 @@ import {NzButtonComponent} from "ng-zorro-antd/button";
 import {NzDrawerComponent} from "ng-zorro-antd/drawer";
 import {NzIconDirective} from "ng-zorro-antd/icon";
 import {NzInputDirective, NzInputGroupComponent} from "ng-zorro-antd/input";
-import {MatTab, MatTabGroup} from "@angular/material/tabs";
+import {MatTab, MatTabGroup, MatTabLabel} from "@angular/material/tabs";
+import {MatIcon} from "@angular/material/icon";
+import {VariableWatcherComponent} from "./variable-watcher/variable-watcher.component";
+import {EditorSettingsComponent} from "./editor-settings/editor-settings.component";
+import {OutlineTreeComponent} from "./outline-tree/outline-tree.component";
+import {NzTabComponent, NzTabSetComponent} from "ng-zorro-antd/tabs";
 @Component({
   selector: 'app-code-editor-tool',
   standalone: true,
@@ -28,14 +33,28 @@ import {MatTab, MatTabGroup} from "@angular/material/tabs";
     NzInputGroupComponent,
     MatTab,
     MatTabGroup,
+    MatIcon,
+    MatTabLabel,
+    VariableWatcherComponent,
+    EditorSettingsComponent,
+    OutlineTreeComponent,
+    NgTemplateOutlet,
+    NzTabComponent,
+    NzTabSetComponent,
   ],
   templateUrl: './code-editor-tool.component.html',
   styleUrl: './code-editor-tool.component.scss'
 })
 export class CodeEditorToolComponent implements AfterViewInit {
+  // 获取标签页的元素引用
+  @ViewChild('fileFolder', { static: true }) fileFolder!: TemplateRef<any>;
+  @ViewChild('variableWatcher', { static: true }) variableWatcher!: TemplateRef<any>;
+  @ViewChild('editorSettings', { static: true }) editorSettings!: TemplateRef<any>;
+  @ViewChild('outlineTree', { static: true }) outlineTree!: TemplateRef<any>;
+
   protected readonly tools = tools;
   showTool = false;
-  @ViewChild('fileFolder') fileFolder: FileFolderComponent
+  // @ViewChild('fileFolder') fileFolder: FileFolderComponent
   // 上一次选中的工具下标
   lastActiveToolIndex: number = 0
 
@@ -59,7 +78,8 @@ export class CodeEditorToolComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-
+    this.tools.map(item => item.component = this[item.component])
+    console.log(this.tools);
   }
 
   changeToolStatus(tool: ITool, index: number) {
@@ -76,23 +96,23 @@ export class CodeEditorToolComponent implements AfterViewInit {
   }
 
   // todo 实现对文件区的操作
-  addFile() {
-    console.log('add file')
-    this.fileFolder.addNewFile();
-  }
-
-  editFile() {
-    console.log('edit file')
-    this.fileFolder.editFile();
-  }
-
-  removeFile() {
-    console.log('remove file')
-    this.fileFolder.removeFile()
-  }
-
-  downloadFile() {
-    console.log("download file")
-    this.fileFolder.downloadFile()
-  }
+  // addFile() {
+  //   console.log('add file')
+  //   this.fileFolder.addNewFile();
+  // }
+  //
+  // editFile() {
+  //   console.log('edit file')
+  //   this.fileFolder.editFile();
+  // }
+  //
+  // removeFile() {
+  //   console.log('remove file')
+  //   this.fileFolder.removeFile()
+  // }
+  //
+  // downloadFile() {
+  //   console.log("download file")
+  //   this.fileFolder.downloadFile()
+  // }
 }
