@@ -6,6 +6,7 @@ import {CodeEditorService} from "./code-editor.service";
 import {MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
 import * as monaco from 'monaco-editor';
 import ITextModel = editor.ITextModel;
+import {editorThemeConfig} from "../pages/code-editor/const/editor.language";
 @Injectable({
   providedIn: 'root'
 })
@@ -124,7 +125,7 @@ export class MonacoService {
       fontSize: 16,
       lineHeight: 30,
       suggestFontSize: 16,
-      theme: 'vs',
+      theme: 'myCustom-theme-dark',
       // theme: media.matches ? 'myCustom-theme-dark' :'myCustom-theme',
       formatOnPaste: true,
       glyphMargin: true,
@@ -185,6 +186,12 @@ export class MonacoService {
     });
 
     monaco.languages.typescript.javascriptDefaults.addExtraLib(this.codeDeclareValue, 'filename/merkaba.d.ts');
+
+    // 注册主题色
+    this.monaco.editor.defineTheme('myCustom-theme-dark', {
+      base: 'vs-dark', // 选择一个基础主题
+      ...editorThemeConfig
+    });
   }
 
   getOutline(model: monaco.editor.ITextModel) {

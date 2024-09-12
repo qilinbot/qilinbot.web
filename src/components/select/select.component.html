@@ -24,7 +24,6 @@
   </div>
 </div>
 
-
 <ng-template #defaultOption>
   <ng-container *ngFor="let option of options" >
     <div class="option" (click)="selectOption(option, $event)" [ngClass]="{'selected': selectedOption?.name === option.name}">{{ option }}</div>

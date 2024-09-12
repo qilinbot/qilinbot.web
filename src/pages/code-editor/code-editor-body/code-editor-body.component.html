@@ -51,12 +51,14 @@
 <!--      </button>-->
 <!--    </span>-->
 <!--  </div>-->
+<!-- 脚本的tab页情况  -->
   <nz-tabset
     [(nzSelectedIndex)]="currentScriptIndex"
     nzType="editable-card"
-    (nzAdd)="newTab()"
     (nzClose)="closeTab($event)"
+    [nzHideAdd]="true"
     style="height: calc(100% - 36px); width: 100%;"
+    [nzTabBarStyle]="{height: '48px'}"
   >
     @for (tab of scriptTabs; track tab) {
       <nz-tab nzClosable [nzTitle]="tab.name" style="height: 100%; width: 100%">

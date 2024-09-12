@@ -2,6 +2,7 @@
 .automated{
   height: 100%;
   width: 100%;
+  overflow: hidden;
   background-color: #121b32;
   color: #E6E6E6;
   font-family: "PingFang SC", serif;
@@ -22,19 +23,11 @@
       flex-direction: row;
       justify-content: left;
       align-items: center;
-      gap: 10px;
+      //gap: 10px;
 
-      .edit-title{
-        color: #FF9900;
-      }
-
-      .version{
-        font-size: 12px;
-        width: 47px;
-        height: 24px;
-        border-radius: 4px;
-        padding: 3px 8px;
-        border: 1px solid rgba(255, 255, 255, 0.20);
+      .title{
+        margin-left: 16px;
+        margin-right: 3px;
       }
     }
 
@@ -90,6 +83,10 @@
     }
   }
 
+  ::ng-deep .as-split-gutter{
+    background: rgba(255, 255, 255, 0.10);
+  }
+
 }
 
 .script-info{
@@ -115,4 +112,9 @@
     color: #69BC35;
   }
 }
+
+
+//::ng-deep .as-split-gutter-icon{
+//  background: rgba(255, 255, 255, 0.10);
+//}
 

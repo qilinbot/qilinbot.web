@@ -5,7 +5,7 @@ import {ScriptEditorComponent} from "../../components/script-editor/script-edito
 import {CodeEditorBodyComponent} from "./code-editor-body/code-editor-body.component";
 import {CodeEditorLogComponent} from "./code-editor-log/code-editor-log.component";
 import {MonacoService} from "../../services/monaco.service";
-import {AsyncPipe, NgClass, NgForOf, NgIf, NgStyle, NgTemplateOutlet} from "@angular/common";
+import {AsyncPipe, Location, NgClass, NgForOf, NgIf, NgStyle, NgTemplateOutlet} from "@angular/common";
 import {NzButtonComponent} from "ng-zorro-antd/button";
 import {NzCascaderComponent} from "ng-zorro-antd/cascader";
 import {NzOptionComponent, NzSelectComponent} from "ng-zorro-antd/select";
@@ -20,7 +20,7 @@ import {NzMenuDirective, NzMenuDividerDirective, NzMenuItemComponent, NzSubMenuC
 import {SelectComponent} from "../../components/select/select.component";
 
 @Component({
-  selector: 'app-code-editor.page',
+  selector: 'app-code-editor-page',
   standalone: true,
   imports: [
     SplitComponent,
@@ -54,7 +54,7 @@ import {SelectComponent} from "../../components/select/select.component";
     SelectComponent
   ],
   templateUrl: './code-editor.page.component.html',
-  styleUrl: './code-editor.page.component.scss'
+  styleUrls: ['./code-editor.page.component.scss']
 })
 export class CodeEditorPageComponent implements OnDestroy {
   @ViewChild('runningLog') runningLog: CodeEditorLogComponent;
@@ -85,7 +85,7 @@ export class CodeEditorPageComponent implements OnDestroy {
 
   allScripts: MerkabaScript[];
 
-  constructor(public monaco: MonacoService) {
+  constructor(public monaco: MonacoService, private location: Location) {
     this.monaco.scriptInitLoaded.subscribe((loaded) => {
       this.loaded = loaded;
 
@@ -104,6 +104,11 @@ export class CodeEditorPageComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.runningLog.cancelAllInstance();
+  }
+
+  goBack(){
+    this.location.back();
+
   }
 
 }

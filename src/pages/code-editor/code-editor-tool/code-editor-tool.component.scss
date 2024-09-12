@@ -1,0 +1,26 @@
+
+.file-folder-wrapper{
+  height: 100%;
+  ::ng-deep .ant-tabs .ant-tabs-nav{
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+  }
+  ::ng-deep .ant-tabs .ant-tabs-nav::before{
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  }
+
+
+  ::ng-deep .ng-star-inserted:not(:first-child){
+    margin-left: 16px;
+  }
+
+  ::ng-deep .ant-tabs-ink-bar{
+    background-color: #FF8F3D;
+  }
+
+  ::ng-deep .ant-tabs-extra-content .qilin-QT_sousuokuang_sousuo::before{
+    border-bottom: none;
+  }
+}
+
+
+//border-bottom: 1px solid var(--, rgba(255, 255, 255, 0.10));
