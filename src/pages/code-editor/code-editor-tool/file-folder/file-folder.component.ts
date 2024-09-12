@@ -129,6 +129,15 @@ export class FileFolderComponent {
   }
 
   /**
+   *
+   */
+  showContextMenu(event: MouseEvent, node){
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectListSelection.toggle(node);
+  }
+
+  /**
    * 新建文件
    */
   addNewFile() {

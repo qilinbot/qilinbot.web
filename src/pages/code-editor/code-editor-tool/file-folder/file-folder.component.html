@@ -1,10 +1,11 @@
-<nz-tree-view *ngIf="dataSource && treeControl" #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true" style="height: 100%; overflow-y: scroll">
+<nz-tree-view *ngIf="dataSource && treeControl" #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true">
   <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
     <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
     <nz-tree-node-option
       [nzDisabled]="node.disabled"
       [nzSelected]="selectListSelection.isSelected(node)"
       (nzClick)="selectListSelection.toggle(node)"
+      (contextmenu)="showContextMenu($event, node)"
       (dblclick)="toLoadScript(node)"
     >
       <!--   叶子结点   -->
@@ -23,6 +24,7 @@
     <nz-tree-node-option
       [nzDisabled]="node.disabled"
       [nzSelected]="selectListSelection.isSelected(node)"
+      (contextmenu)="showContextMenu($event, node)"
       (nzClick)="selectListSelection.toggle(node)"
     >
       <!--   非叶子结点 （肯定是文件夹）  -->

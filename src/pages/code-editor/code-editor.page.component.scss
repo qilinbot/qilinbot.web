@@ -82,11 +82,20 @@
       }
     }
   }
+  .body-container{
+    width: 100%;
+    height: calc(100% - 74px);
+    overflow: hidden;
+  }
 
   ::ng-deep .as-split-gutter{
     background: rgba(255, 255, 255, 0.10);
   }
 
+  .as-split-area{
+    overflow: hidden;
+    height: 100%;
+  }
 }
 
 .script-info{

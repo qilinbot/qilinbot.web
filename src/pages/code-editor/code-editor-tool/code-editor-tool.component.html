@@ -5,7 +5,9 @@
         <ng-template #titleTemplate>
           <i [class]="'QILIN  '+ tool.icon" style="color: #899DB7; font-size: 48px;"></i>
         </ng-template>
-        <ng-container *ngTemplateOutlet="tool.component"></ng-container>
+        <div class="tool-content">
+          <ng-container *ngTemplateOutlet="tool.component"  ></ng-container>
+        </div>
       </nz-tab>
     }
   </nz-tabset>
