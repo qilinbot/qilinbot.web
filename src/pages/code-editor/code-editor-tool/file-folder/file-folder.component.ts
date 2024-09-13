@@ -26,6 +26,8 @@ import {RenderService} from "../../../../core/render.service";
 import {NzTooltipDirective} from "ng-zorro-antd/tooltip";
 import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
 import {MonacoService} from "../../../../services/monaco.service";
+import {NzContextMenuService, NzDropDownDirective, NzDropdownMenuComponent} from "ng-zorro-antd/dropdown";
+import {NzMenuDirective, NzMenuDividerDirective, NzMenuItemComponent, NzSubMenuComponent} from "ng-zorro-antd/menu";
 
 export enum EIconType {
   'xpa-wangzhan',
@@ -77,6 +79,12 @@ interface FlatNode {
     NzSelectModule,
     NzTooltipDirective,
     NzPopconfirmDirective,
+    NzDropdownMenuComponent,
+    NzMenuItemComponent,
+    NzSubMenuComponent,
+    NzMenuDividerDirective,
+    NzMenuDirective,
+    NzDropDownDirective,
   ],
   templateUrl: './file-folder.component.html',
   styleUrl: './file-folder.component.scss',
@@ -108,7 +116,7 @@ export class FileFolderComponent {
     node => node.children
   );
   dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
-  constructor(private service: CodeEditorService, private render: RenderService, private monaco: MonacoService) {
+  constructor(private service: CodeEditorService, private render: RenderService, private monaco: MonacoService,private nzContextMenuService: NzContextMenuService) {
     this.service.load({}).subscribe(resp => {
       // todo 初始化monaco的所有模块 改成按需加载
       this.monaco.initModels(resp.items).then(r => this.monaco.scriptInitLoaded.next(true));
@@ -135,6 +143,14 @@ export class FileFolderComponent {
     event.preventDefault();
     event.stopPropagation();
     this.selectListSelection.toggle(node);
+  }
+
+  /**
+   *
+   */
+  onContextMenu(event, view, node){
+    this.nzContextMenuService.create(event, view);
+    console.log(node)
   }
 
   /**
@@ -261,6 +277,20 @@ export class FileFolderComponent {
         this.updateNodeVersion(node.children, nodeId, newVersion);
       }
     }
+  }
+
+  /**
+   * 新建文件夹
+   */
+  newFolder() {
+
+  }
+
+  /**
+   * 新建文件
+   */
+  newFile(){
+
   }
 
 

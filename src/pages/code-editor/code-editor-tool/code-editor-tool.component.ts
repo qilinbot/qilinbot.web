@@ -15,6 +15,8 @@ import {VariableWatcherComponent} from "./variable-watcher/variable-watcher.comp
 import {EditorSettingsComponent} from "./editor-settings/editor-settings.component";
 import {OutlineTreeComponent} from "./outline-tree/outline-tree.component";
 import {NzTabComponent, NzTabSetComponent} from "ng-zorro-antd/tabs";
+import {NzContextMenuService, NzDropdownMenuComponent} from "ng-zorro-antd/dropdown";
+import {NzMenuDirective, NzMenuItemComponent} from "ng-zorro-antd/menu";
 @Component({
   selector: 'app-code-editor-tool',
   standalone: true,
@@ -41,6 +43,9 @@ import {NzTabComponent, NzTabSetComponent} from "ng-zorro-antd/tabs";
     NgTemplateOutlet,
     NzTabComponent,
     NzTabSetComponent,
+    NzDropdownMenuComponent,
+    NzMenuDirective,
+    NzMenuItemComponent,
   ],
   templateUrl: './code-editor-tool.component.html',
   styleUrl: './code-editor-tool.component.scss'
@@ -52,14 +57,17 @@ export class CodeEditorToolComponent implements AfterViewInit {
   @ViewChild('editorSettings', { static: true }) editorSettings!: TemplateRef<any>;
   @ViewChild('outlineTree', { static: true }) outlineTree!: TemplateRef<any>;
 
+  @ViewChild('fileFolderComponent') fileFolderComponent: FileFolderComponent
   protected readonly tools = tools;
   showTool = false;
-  // @ViewChild('fileFolder') fileFolder: FileFolderComponent
+
+
   // 上一次选中的工具下标
   lastActiveToolIndex: number = 0
 
   constructor(
     public service: CodeEditorService,
+    private nzContextMenuService: NzContextMenuService
   ) {
     this.changeToolStatus(this.tools[0], 0)
     this.service.windowChannel.subscribe(res => {
@@ -80,6 +88,7 @@ export class CodeEditorToolComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.tools.map(item => item.component = this[item.component])
     console.log(this.tools);
+
   }
 
   changeToolStatus(tool: ITool, index: number) {
@@ -95,24 +104,23 @@ export class CodeEditorToolComponent implements AfterViewInit {
     }
   }
 
-  // todo 实现对文件区的操作
-  // addFile() {
-  //   console.log('add file')
-  //   this.fileFolder.addNewFile();
-  // }
-  //
-  // editFile() {
-  //   console.log('edit file')
-  //   this.fileFolder.editFile();
-  // }
-  //
-  // removeFile() {
-  //   console.log('remove file')
-  //   this.fileFolder.removeFile()
-  // }
-  //
-  // downloadFile() {
-  //   console.log("download file")
-  //   this.fileFolder.downloadFile()
-  // }
+  onContextMenu(event, view){
+    this.nzContextMenuService.create(event, view);
+  }
+
+  /**
+   * 新建文件夹
+   */
+  newFolder(){
+    this.fileFolderComponent.newFolder();
+  }
+
+  /**
+   * 新建文件
+   */
+
+  newFile(){
+    this.fileFolderComponent.newFile();
+  }
+
 }

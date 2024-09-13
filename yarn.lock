@@ -5035,7 +5035,7 @@ jsonc-parser@3.3.1:
 
 jsoneditor@^10.1.0:
   version "10.1.0"
-  resolved "https://registry.npmmirror.com/jsoneditor/-/jsoneditor-10.1.0.tgz#3530ae3b1996fb6ba75921ccb8350ce1af1e696e"
+  resolved "http://npm.runtongqiuben.com/jsoneditor/-/jsoneditor-10.1.0.tgz#3530ae3b1996fb6ba75921ccb8350ce1af1e696e"
   integrity sha512-s+BP/x9Rx9ukNyTjeWCvIAGTEvXwCw6l4NX4mlxXfkK87F1ZgsesHbD9SsyZDLP27dvcFgr9H/j1jy/Bzzk07Q==
   dependencies:
     ace-builds "^1.35.0"

@@ -1,0 +1,66 @@
+.setting-container{
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+  .setting-item{
+    display: flex;
+    flex-direction: column;
+    .setting-title{
+      color: #566080;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      .json-editor-type{
+        border-radius: 4px;
+        background: var(---, #333E57);
+        width: 120px;
+        height: 24px;
+        span{
+          width: 60px;
+          height: 20px;
+          line-height: 24px;
+          padding: 0 16px;
+        }
+        .active{
+          background: #52617e;
+          color: #EBECEF;
+          border-radius: 4px;
+        }
+      }
+    }
+    .all-argus{
+      color: #D0D1D6;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+      .argus-item{
+        margin: 0;
+        //padding: 24px;
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+.setting-config-edit{
+  color: #899DB7;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  .edit-item{
+    padding: 0;
+    margin: 0;
+    height: 40px;
+    line-height: 40px;
+    input{
+      margin-left: 8px;
+      background: #121b32;
+      border: none;
+      outline: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+  }
+}

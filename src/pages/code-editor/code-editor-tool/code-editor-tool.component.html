@@ -5,7 +5,7 @@
         <ng-template #titleTemplate>
           <i [class]="'QILIN  '+ tool.icon" style="color: #899DB7; font-size: 48px;"></i>
         </ng-template>
-        <div class="tool-content">
+        <div class="tool-content" (contextmenu)="onContextMenu($event, clickEmpty)">
           <ng-container *ngTemplateOutlet="tool.component"  ></ng-container>
         </div>
       </nz-tab>
@@ -14,11 +14,20 @@
 </div>
 
 
+<nz-dropdown-menu #clickEmpty="nzDropdownMenu">
+  <ul nz-menu>
+    <li nz-menu-item>文件</li>
+    <li nz-menu-item>文件夹</li>
+    <!--    <li nz-menu-divider></li>-->
+  </ul>
+</nz-dropdown-menu>
+
+
 <ng-template #search>
   <i class="QILIN qilin-QT_sousuokuang_sousuo" style="font-size: 24px; color: #D0D1D6"></i>
 </ng-template>
 <ng-template #fileFolder>
-  <app-file-folder></app-file-folder>
+  <app-file-folder #fileFolderComponent></app-file-folder>
 </ng-template>
 <ng-template #variableWatcher>
   <app-variable-watcher></app-variable-watcher>

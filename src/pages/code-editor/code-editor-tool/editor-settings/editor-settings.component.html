@@ -1,1 +1,37 @@
-<p>editor-settings works!</p>
+<div class="setting-container">
+  <div class="setting-item">
+    <div class="setting-title">
+      <div>参数列表</div>
+      <div class="json-editor-type">
+        <span [ngClass]="{'active': mode === 'code'}" (click)="mode= 'code'">Code</span>
+        <span [ngClass]="{'active': mode === 'view'}" (click)="mode = 'view'">View</span>
+      </div>
+    </div>
+    <app-json-editor [mode]="mode"></app-json-editor>
+  </div>
+  <div class="setting-item">
+    <div class="setting-title"><div>参数配置</div></div>
+    <div class="all-argus">
+      <ng-container *ngFor="let arg of ArgusConfig">
+        <div class="argus-item">
+          <div class="argus-name">{{arg.title}}</div>
+          <nz-switch [(ngModel)]="arg.argusName"></nz-switch>
+        </div>
+        <ng-container *ngIf="arg.editorConfig">
+          <ng-container *ngTemplateOutlet="editorConfig;context: {$implicit: arg.editorConfig}"></ng-container>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #editorConfig let-configs>
+  <div class="setting-config-edit">
+    <ng-container *ngFor="let config of configs">
+      <div class="edit-item">
+        <span>{{config.title}}</span>
+        <input [placeholder]="config.placeHolder">
+      </div>
+    </ng-container>
+  </div>
+</ng-template>

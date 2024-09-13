@@ -24,9 +24,20 @@
     border-bottom: none;
   }
   ::ng-deep .ant-tabs-content-holder{
-    height: calc(100% - 64px);
-    overflow-y: scroll;
+    height: 100%;
+    .ant-tabs-content{
+      height: 100%;
+      .ant-tabs-tabpane{
+        height: 100%;
+        .tool-content{
+          height: 100%;
+          overflow-y: scroll;
+          overflow-x: hidden;
+        }
+      }
+    }
   }
+
 
 }
 .tool-contend{

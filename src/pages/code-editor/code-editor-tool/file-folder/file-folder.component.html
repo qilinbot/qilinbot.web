@@ -9,7 +9,7 @@
       (dblclick)="toLoadScript(node)"
     >
       <!--   叶子结点   -->
-      <div class="list-noleaf">
+      <div class="list-noleaf" (contextmenu)="onContextMenu($event, clickFile, node)">
         <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
 <!--        <span nz-icon [nzType]="node.type === 2 ? 'file' : 'folder-open'" nzTheme="outline"></span>-->
         <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
@@ -28,9 +28,10 @@
       (nzClick)="selectListSelection.toggle(node)"
     >
       <!--   非叶子结点 （肯定是文件夹）  -->
-      <div class="list-noleaf">
+      <div class="list-noleaf" nz-dropdown  nzOverlayClassName="list-noleaf-container"
+           (contextmenu)="onContextMenu($event, clickFolder, node)"
+      >
         <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
-<!--        <span nz-icon [nzType]="treeControl.isExpanded(node) ? 'folder-open' : 'folder'" nzTheme="outline"></span>-->
         <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
       </div>
     </nz-tree-node-option>
@@ -50,6 +51,38 @@
     </ng-container>
   </div>
 </ng-template>
+
+
+<!--
+ 通过传入的node区分下面三类
+ 点击空白区域只有 1. 文件 2. 文件夹
+ 点击文件       2. 发布 2. 重命名  3. 删除
+ 点击文件夹      1. 新建 1）文件夹 2）文件  2 重命名  3 删除
+ -->
+<nz-dropdown-menu #clickFolder="nzDropdownMenu" >
+  <ul nz-menu>
+    <li nz-submenu   nzTitle="新建">
+      <ul  class="list-noleaf-container" >
+        <li  nz-menu-item>文件</li>
+        <li nz-menu-item>文件夹</li>
+      </ul>
+    </li>
+    <li nz-menu-item>发布</li>
+    <li nz-menu-item>重命名</li>
+    <li nz-menu-item>删除</li>
+<!--    <li nz-menu-divider></li>-->
+  </ul>
+</nz-dropdown-menu>
+
+<nz-dropdown-menu #clickFile="nzDropdownMenu">
+  <ul nz-menu>
+    <li nz-menu-item>发布</li>
+    <li nz-menu-item>重命名</li>
+    <li nz-menu-item>删除</li>
+    <!--    <li nz-menu-divider></li>-->
+  </ul>
+</nz-dropdown-menu>
+
 
 <ng-template let-node #treeViewIcon>
 <!--  <span nz-icon [nzType]="(node.type === 1 || node.type === 0)  ? (treeControl.isExpanded(node) ? 'folder-open' : 'folder') : 'file'" nzTheme="outline"></span>-->
@@ -78,6 +111,7 @@
     </svg>
   </ng-template>
 </ng-template>
+
 
 
 
