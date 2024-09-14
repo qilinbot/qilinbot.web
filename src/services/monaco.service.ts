@@ -1,12 +1,13 @@
-import { Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject, firstValueFrom, Subject} from 'rxjs';
+import * as monaco from "monaco-editor";
 import {editor} from "monaco-editor";
 import {CodeDeclareService} from "./code-declare.service";
 import {CodeEditorService} from "./code-editor.service";
 import {MerkabaRecord, MerkabaScript} from "../pages/code-editor/const/code-editor.page.const";
-import * as monaco from 'monaco-editor';
-import ITextModel = editor.ITextModel;
 import {editorThemeConfig} from "../pages/code-editor/const/editor.language";
+import ITextModel = editor.ITextModel;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -121,7 +122,7 @@ export class MonacoService {
       autoClosingBrackets: 'beforeWhitespace',
       autoClosingQuotes: 'beforeWhitespace',
       smoothScrolling: true,
-      readOnly: !script.editable,
+      readOnly: script.editable,
       fontSize: 16,
       lineHeight: 30,
       suggestFontSize: 16,
@@ -147,8 +148,14 @@ export class MonacoService {
     editor.onDidChangeModelContent(res => {
       this.scriptChanged.next({action: 'scriptChanged', scriptId, content: editor.getValue()})
 
-      // todo 监听并获取大纲的内容
-      // this.getOutline(this.models)；
+      // todo 监听并获取大纲的内容  逻辑有问题
+      // 获取当前的正在编辑的uri
+      console.log(res)
+      const model = editor.getModel();
+      this.getOutline("file://" + model.uri.path).then(res => {
+        console.log(res);
+        this.codeEditorService.scriptChannel.next({type: 'currentScript', scriptOutLine: res});
+      })
     })
 
     editor.onMouseDown(res => {
@@ -194,18 +201,6 @@ export class MonacoService {
     });
   }
 
-  getOutline(model: monaco.editor.ITextModel) {
-    monaco.languages.typescript.getTypeScriptWorker().then(worker => {
-      worker(model.uri).then((client: any) => {
-        client.getNavigationTree(model.uri.toString()).then((tree: any) => {
-          console.log(tree);  // 打印出当前文件的代码结构树
-        });
-      });
-    }).catch(error => {
-      console.error('Error getting TypeScript worker:', error);
-    });
-  }
-
 
   setCursor(uri, start){
     console.log(this.models[uri])
@@ -216,6 +211,23 @@ export class MonacoService {
       this.editorMap.get(uri).setPosition(position);
       this.editorMap.get(uri).revealPositionInCenter(position);
       console.log('切换定位成功！')
+    }
+  }
+
+  /**
+   * 获取代码结构树
+   * @param url
+   */
+  async getOutline(url: string): Promise<any> {
+    try {
+      const model = this.models[url];
+      console.log(model, this.models);
+      const worker = await monaco.languages.typescript.getJavaScriptWorker();
+      const client = await worker(model.uri);
+      return await client.getNavigationTree(model.uri.toString());  // 返回导航树
+    } catch (error) {
+      console.error('Error getting TypeScript worker:', error);
+      return null;
     }
   }
 }

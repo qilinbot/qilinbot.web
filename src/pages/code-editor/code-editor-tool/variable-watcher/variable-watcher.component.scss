@@ -1,0 +1,19 @@
+.variable-watcher-container{
+  color: #899DB7;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  .container-top{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    .hover:hover{
+      color: #D0D1D6;
+    }
+  }
+  .container-content{
+
+
+  }
+}

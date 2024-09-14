@@ -126,6 +126,19 @@ export class CodeEditorBodyComponent implements AfterViewInit{
       })
   }
 
+  /**
+   * 切换创建新标签页的一系列操作
+   * 1. 通知大纲树组件跟新大纲
+   * @param event
+   */
+  switchTabChange(event){
+    console.log(event);
+    this.monacoService.getOutline('file:///' + this.scripts[event.index].uri + '.js').then(res => {
+      console.log(res);
+      this.service.scriptChannel.next({type: "currentScript", scriptOutLine: res});
+    })
+  }
+
 
   saveScript(script: MerkabaScript){
     console.log(script, 'save script');

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import {GeoIPDashboardComponent} from "../geo-ipdashboard/geo-ipdashboard.component";
 import {SelectComponent} from "../select/select.component";
 import {JsonEditorComponent} from "../json-editor/json-editor.component";
+import {EditInputComponent} from "../edit-input/edit-input.component";
 @Component({
   selector: 'app-test',
   templateUrl: './test.component.html',
@@ -9,7 +10,8 @@ import {JsonEditorComponent} from "../json-editor/json-editor.component";
   imports: [
     GeoIPDashboardComponent,
     SelectComponent,
-    JsonEditorComponent
+    JsonEditorComponent,
+    EditInputComponent
   ],
   styleUrls: ['./test.component.scss']
 })

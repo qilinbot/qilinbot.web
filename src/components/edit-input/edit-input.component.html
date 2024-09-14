@@ -1,0 +1,21 @@
+<section class="element-box" nz-tooltip [nzTooltipTitle]="text + '   :' + value">
+  <!-- 展示部分 -->
+  <div class="show" *ngIf="!isEdit">
+    <div
+      class="show-text"
+      (dblclick)="editText()"
+      [innerText]="text + ':' + value"
+    ></div>
+    <i class="QILIN qilin-QT_shanchu shanchu" (click)="delete()"></i>
+  </div>
+  <!-- 编辑部分 -->
+  <div #textBox class="textbox" *ngIf="isEdit">
+    <div
+      class="textbox-container"
+      contenteditable="true"
+      (blur)="updateText()"
+      id="textbox"
+      [innerText]="text"
+    ></div>
+  </div>
+</section>
