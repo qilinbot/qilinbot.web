@@ -13,6 +13,8 @@ import ITextModel = editor.ITextModel;
 })
 export class MonacoService {
   monaco = monaco;
+  // todo 记录当前展示的脚本uri 核心 有什么东西都通过uri去实现
+  currentScriptUri: string;
 
   scriptInitLoaded = new BehaviorSubject<boolean>(false);
   /**
@@ -46,6 +48,7 @@ export class MonacoService {
     this.codeEditorService.scriptChannel.subscribe(res => {
       switch (res.type){
         case 'switchScript':
+          this.currentScriptUri = res.script.uri;
           // this.currentEditor = this.editorMap.get(res.script.id);
           // 切换当前编辑器实例有问题
           // console.log(this.currentEditor)
@@ -207,11 +210,18 @@ export class MonacoService {
     const model = this.models[uri];
     if(model){
       const position = model.getPositionAt(start);
-      console.log(position)
       this.editorMap.get(uri).setPosition(position);
       this.editorMap.get(uri).revealPositionInCenter(position);
       console.log('切换定位成功！')
     }
+  }
+
+  setCursorByPosition( position){
+    let uri = 'file:///' + this.currentScriptUri + '.js';
+    const pos = this.models[uri].getPositionAt(position.start);
+    this.editorMap.get(uri).setPosition(pos);
+    this.editorMap.get(uri).revealPositionInCenter(pos);
+    console.log("切换定位成功！")
   }
 
   /**

@@ -137,6 +137,9 @@ export class CodeEditorBodyComponent implements AfterViewInit{
       console.log(res);
       this.service.scriptChannel.next({type: "currentScript", scriptOutLine: res});
     })
+
+    // 修改需改当前运行的脚本
+    this.monacoService.currentScriptUri = this.scripts[event.index].uri;
   }
 
 

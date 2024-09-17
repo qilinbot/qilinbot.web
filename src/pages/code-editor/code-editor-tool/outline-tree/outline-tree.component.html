@@ -8,15 +8,15 @@
     nzExpandAll="true"
   ></nz-tree>
   <ng-template #nzTreeTemplate let-node let-origin="origin">
-      <span class="custom-node">
+      <span class="custom-node" (dblclick)="jumpTo(node)">
         @if (!node.isLeaf) {
-          <span >
-            <span nz-icon [nzType]="node.isExpanded ? 'folder-open' : 'folder'" (click)="openFolder(node)"></span>
+          <span class="outline-node">
+            <ng-container *ngTemplateOutlet="icon;context: {$implicit: node.kind}"></ng-container>
             <span class="folder-name">{{ node.title }}</span>
           </span>
         } @else {
-          <span >
-            <span nz-icon nzType="file"></span>
+          <span class="outline-node">
+            <ng-container *ngTemplateOutlet="icon;context: {$implicit: node.kind}"></ng-container>
             <span class="file-name">{{ node.title }}</span>
           </span>
         }
@@ -24,10 +24,16 @@
   </ng-template>
 </div>
 
-<ng-template let-node>
+<ng-template let-kind #icon>
   <div>
-    @if(node.kind === 'function') {
-      <i class="QILIN "></i>
+    @if(kind === 'function') {
+      <i class="QILIN qilin-QT_dagang_fangfa"></i>
+    }
+    @else if(kind === 'class') {
+      <i class="QILIN qilin-QT_dagang_lei"></i>
+    }
+    @else{
+      <i class="QILIN qilin-QT_dagang_P"></i>
     }
   </div>
 </ng-template>

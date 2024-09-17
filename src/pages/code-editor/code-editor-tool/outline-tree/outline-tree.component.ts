@@ -25,10 +25,9 @@ export class OutlineTreeComponent {
   outlineTree;
 
   // todo 切换标签页的时候 大纲变化 以及在编写代码的时候 动态的去调用
-  constructor(private service: CodeEditorService, private nzContextMenuService: NzContextMenuService, private cdr: ChangeDetectorRef) {
+  constructor(private monaco: MonacoService, private service: CodeEditorService, private nzContextMenuService: NzContextMenuService, private cdr: ChangeDetectorRef) {
     this.service.scriptChannel.subscribe(res => {
       if(res.type === "currentScript"){
-
         this.outlineTree = this.renameFields(res.scriptOutLine).children;
         console.log(this.outlineTree)
         this.cdr.markForCheck(); // 手动标记检查点
@@ -59,6 +58,12 @@ export class OutlineTreeComponent {
       newObj.isLeaf = true;
     }
     return newObj;
+  }
+
+  jumpTo(node){
+    console.log(node.origin)
+    console.log(node.origin.spans);
+    this.monaco.setCursorByPosition(node.origin.spans[0]);
   }
 
 

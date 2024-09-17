@@ -3,4 +3,7 @@
     background: #121b32;
     color: #D0D1D6;
   }
+  ::ng-deep .outline-node{
+    display: flex;
+  }
 }

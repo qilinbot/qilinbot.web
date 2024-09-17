@@ -28,6 +28,7 @@ import {NzPopconfirmDirective} from "ng-zorro-antd/popconfirm";
 import {MonacoService} from "../../../../services/monaco.service";
 import {NzContextMenuService, NzDropDownDirective, NzDropdownMenuComponent} from "ng-zorro-antd/dropdown";
 import {NzMenuDirective, NzMenuDividerDirective, NzMenuItemComponent, NzSubMenuComponent} from "ng-zorro-antd/menu";
+import {BehaviorSubject} from "rxjs";
 
 export enum EIconType {
   'xpa-wangzhan',
@@ -46,6 +47,7 @@ interface FlatNode {
   prdVersion?: number
   parentRecord?: MerkabaRecord
   children?: Array<MerkabaRecord>
+  isEditing: boolean
 
   // 提供树形结构去使用
   expandable: boolean;
@@ -92,15 +94,22 @@ interface FlatNode {
 export class FileFolderComponent {
   iconType = EIconType;
   private fileData: MerkabaRecord[] = [];
+  // 用于搜索
+  searchValue$ = new BehaviorSubject<string>('');
+  // 记录当前选中的结点
+  currentSelectNode: FlatNode;
+  // 记录当前结点展开的情况
+  expandedNodeKeys: string[] = [];
   @ViewChild("treeView", {static: false}) treeView!: NzTreeViewComponent<FlatNode>;
   // 扁平化
   private transformer = (node: MerkabaRecord, level: number): FlatNode => ({
     ...node,
     expandable: !!node.children && node.children.length > 0,
     name: node.name,
-    parentRecord: node.parentRecord,
+    // parentRecord: node.parentRecord,
     level,
     disabled: false,
+    isEditing: false,
   });
   selectListSelection = new SelectionModel<FlatNode>();
 
@@ -122,6 +131,7 @@ export class FileFolderComponent {
       this.monaco.initModels(resp.items).then(r => this.monaco.scriptInitLoaded.next(true));
       this.fileData = resp.items;
       this.dataSource.setData(resp.items);
+      console.log(resp.items);
     })
   }
 
@@ -143,6 +153,7 @@ export class FileFolderComponent {
     event.preventDefault();
     event.stopPropagation();
     this.selectListSelection.toggle(node);
+    this.currentSelectNode = node;  // 记录当前选中的结点
   }
 
   /**
@@ -153,79 +164,71 @@ export class FileFolderComponent {
     console.log(node)
   }
 
+  stopEditing(node: any){
+    node.idEditing = false;
+  }
+
+  confirmEdit(node: any): void {
+    node.isEditing = false;
+    // 在这里保存修改后的名称，执行更新逻辑
+    console.log(`Updated name: ${node.name}`);
+  }
+
   /**
-   * 新建文件
+   * 在添加文件的时候， 如果选中文件夹则在他的创建文件与子节点，如果选中文件的话，直接在他的同级创建
+   * 当前只是创建一个创建窗口 只有在输入了文件名之后才能 创建成功 否则失败
    */
-  addNewFile() {
-    const parseParentId = (node: FlatNode) => {
-      if (!node) return "";
-      else {
-        switch (node.type) {
-          case 0:
-          case 1:
-            return node.id
-          default:
-            return node.parentId || node.id;
-        }
-      }
+  addNode(type: number){
+    console.log(this.currentSelectNode, this.selectListSelection.selected);
+    const newNode: FlatNode = { //
+      expandable: type === 1,   // type 1 文件夹  2 为文件
+      level: this.currentSelectNode.level + 1,
+      disabled: false,
+      isEditing: true,
     }
-    const getRecord = (node: FlatNode): MerkabaRecord => {
+    // 然后添加到tree中
+    this.currentSelectNode.children.unshift(newNode);
+    this.dataSource.getData()
+    console.log(this.dataSource.getData());
+    console.log(this.fileData);
+    this.dataSource.setData(this.fileData);
+  }
+
+  //
+  refreshData(newData: FlatNode[]){
+
+  }
+
+  saveExpandedState(): void {
+    this.expandedNodeKeys = [];
+    this.treeControl.dataNodes.forEach(node => {
+      if (this.treeControl.isExpanded(node)) {
+        this.expandedNodeKeys.push(node.id);
+      }
+    });
+    console.log('Expanded Node Keys:', this.expandedNodeKeys);
+  }
+
+
+  restoreExpandedState(): void {
+    this.expandedNodeKeys.forEach(key => {
+      const node = this.findNodeByKey(key, this.treeControl.dataNodes);
       if (node) {
-        delete node.disabled;
-        delete node.expandable;
-        delete node.level;
+        this.treeControl.expand(node);
       }
-      return node;
-    }
-    console.log(this.selectListSelection.selected)
-    let selectedNode = this.selectListSelection.selected;
-    let parentRecord = this.selectListSelection.selected
-    let parentId = parseParentId(selectedNode[0]);
-    let newFile: MerkabaRecord = {parentId, id: '', name: '', parentRecord: getRecord(parentRecord[0])}
-    // this.updateFile(newFile, false, 'add');
+    });
   }
 
-  /**
-   * 选中文件夹的内容删除文件
-   */
-  removeFile() {
-    const deleteRecord = this.selectListSelection.selected[0];
-    if (!deleteRecord) {
-      return; // 没有选择
-    }
-
-    let result = this.render.confirm('确定要删除{' + deleteRecord.name + '}吗？');
-    if (result) {
-      this.service.remove(deleteRecord.id).subscribe(resp => {
-        this.removeNodeRecursively(this.fileData, deleteRecord.id);
-        this.dataSource.setData(this.fileData); // 更新视图
-      });
-    }
-  }
-  private removeNodeRecursively(nodes: MerkabaRecord[], nodeId: string): boolean {
-    for (let i = 0; i < nodes.length; i++) {
-      if (nodes[i].id === nodeId) {
-        nodes.splice(i, 1);
-        return true;
-      }
-      if (nodes[i].children && this.removeNodeRecursively(nodes[i].children, nodeId)) {
-        return true;
+  findNodeByKey(key: string, nodes: FlatNode[]): FlatNode | null {
+    for (const node of nodes) {
+      if (node.id === key) {
+        return node;
       }
     }
-    return false;
+    return null;
   }
 
 
-  /**
-   * 修改文件的基本信息
-   */
-  editFile() {
-    let editRecord = this.selectListSelection.selected[0];
-
-    if (editRecord.parentId) {
-      editRecord.parentRecord = this.selectListSelection.selected[0].parentRecord;
-    }
-  }
 
   /**
    *下载脚本代码
@@ -266,7 +269,7 @@ export class FileFolderComponent {
     });
   }
 
-// 更新本地树节点的版本号
+ // 更新本地树节点的版本号
   updateNodeVersion(nodes: MerkabaRecord[], nodeId: string, newVersion: number) {
     for (let node of nodes) {
       if (node.id === nodeId) {
@@ -278,31 +281,4 @@ export class FileFolderComponent {
       }
     }
   }
-
-  /**
-   * 新建文件夹
-   */
-  newFolder() {
-
-  }
-
-  /**
-   * 新建文件
-   */
-  newFile(){
-
-  }
-
-
-  /**
-   * 弹窗新建/修改文件信息
-   * @param data
-   * @param isEdit
-   * @param type
-   */
-  // updateFile(data: MerkabaRecord, isEdit: boolean = false, type: 'add' | 'modify') {
-  //   const fileEditModalInstance = results.modalContentInstance as FileEditModalComponent;
-  //   fileEditModalInstance.initData(data);
-  // }
-
 }

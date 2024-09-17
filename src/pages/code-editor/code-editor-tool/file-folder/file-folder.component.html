@@ -1,4 +1,10 @@
 <nz-tree-view *ngIf="dataSource && treeControl" #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true">
+  <nz-input-group [nzSuffix]="suffixIcon">
+    <input type="text" nz-input placeholder="Search" ngModel (ngModelChange)="searchValue$.next($event)" />
+  </nz-input-group>
+  <ng-template #suffixIcon>
+    <span nz-icon nzType="search"></span>
+  </ng-template>
   <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
     <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
     <nz-tree-node-option
@@ -10,9 +16,18 @@
     >
       <!--   叶子结点   -->
       <div class="list-noleaf" (contextmenu)="onContextMenu($event, clickFile, node)">
-        <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
-<!--        <span nz-icon [nzType]="node.type === 2 ? 'file' : 'folder-open'" nzTheme="outline"></span>-->
-        <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
+        <ng-container *ngIf="!node.isEditing; else editMode"></ng-container>
+          <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
+          <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
+<!--    添加输入框的模板    -->
+        <ng-template #editMode>
+          <input
+            [(ngModel)]="node.name"
+            (blur)="stopEditing(node)"
+            (keydown.enter)="confirmEdit(node)"
+            class="edit-input"
+          />
+        </ng-template>
       </div>
     </nz-tree-node-option>
   </nz-tree-node>
@@ -31,8 +46,19 @@
       <div class="list-noleaf" nz-dropdown  nzOverlayClassName="list-noleaf-container"
            (contextmenu)="onContextMenu($event, clickFolder, node)"
       >
-        <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
-        <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
+        <ng-container *ngIf="!node.isEditing; else editMode">
+          <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
+          <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
+        </ng-container>
+        <!--    添加输入框的模板    -->
+        <ng-template #editMode>
+          <input
+            [(ngModel)]="node.name"
+            (blur)="stopEditing(node)"
+            (keydown.enter)="confirmEdit(node)"
+            class="edit-input"
+          />
+        </ng-template>
       </div>
     </nz-tree-node-option>
   </nz-tree-node>
@@ -63,8 +89,8 @@
   <ul nz-menu>
     <li nz-submenu   nzTitle="新建">
       <ul  class="list-noleaf-container" >
-        <li  nz-menu-item>文件</li>
-        <li nz-menu-item>文件夹</li>
+        <li  nz-menu-item (click)="addNode(2)">文件</li>
+        <li nz-menu-item (click)="addNode(1)">文件夹</li>
       </ul>
     </li>
     <li nz-menu-item>发布</li>

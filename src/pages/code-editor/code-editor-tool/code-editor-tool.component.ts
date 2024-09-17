@@ -108,19 +108,4 @@ export class CodeEditorToolComponent implements AfterViewInit {
     this.nzContextMenuService.create(event, view);
   }
 
-  /**
-   * 新建文件夹
-   */
-  newFolder(){
-    this.fileFolderComponent.newFolder();
-  }
-
-  /**
-   * 新建文件
-   */
-
-  newFile(){
-    this.fileFolderComponent.newFile();
-  }
-
 }
