@@ -77,12 +77,10 @@
             ],
             "styles": [
               "node_modules/ng-zorro-antd/ng-zorro-antd.css",
-              "node_modules/jsoneditor/dist/jsoneditor.min.css",
               "src/assets/iconfont/iconfont.css",
               "src/styles.scss"
             ],
             "scripts": [
-              "node_modules/jsoneditor/dist/jsoneditor.min.js"
             ]
           },
           "configurations": {

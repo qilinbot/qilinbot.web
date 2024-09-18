@@ -7,7 +7,8 @@
         <span [ngClass]="{'active': mode === 'view'}" (click)="mode = 'view'">View</span>
       </div>
     </div>
-    <app-json-editor [mode]="mode"></app-json-editor>
+    <ace *ngIf="mode === 'code'" [config]="config" [mode]="'text'" [theme]="'eclipse'" [(value)]="code" style="height: 442px" #jsonEditor></ace>
+    <ngx-json-viewer *ngIf="mode === 'view'" [json]="data"></ngx-json-viewer>
   </div>
   <div class="setting-item">
     <div class="setting-title"><div>参数配置</div></div>

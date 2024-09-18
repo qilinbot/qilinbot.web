@@ -1,5 +1,3 @@
-import * as string_decoder from "string_decoder";
-
 export const ArgusConfig: Argument[] = [
   {argusName: 'proxy', title: '是否启用代理',
     editorConfig: [
