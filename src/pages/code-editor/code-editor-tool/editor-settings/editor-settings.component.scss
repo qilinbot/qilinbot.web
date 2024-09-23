@@ -5,6 +5,30 @@
   .setting-item{
     display: flex;
     flex-direction: column;
+    ::ng-deep ace{
+
+
+      .ace_editor{
+        background: #000e17;    // 编辑器的背景颜色
+        color: #D0D1D6;
+        .ace_gutter{
+          background: #000e17;    // 编辑器列号的背景颜色
+          color: #D0D1D6;
+        }
+        .ace_cursor {
+          color: rgba(0, 128, 255, 0.3);   // 鼠标光标的前景颜色
+          //background-color: rgba(0, 128, 255, 0.3);    // 鼠标光标的背景颜色
+        }
+        .ace_marker-layer .ace_selection {
+          background-color: rgba(0, 128, 255, 0.3);   // 选中的背景颜色
+        }
+        .ace_gutter-active-line{
+          background-color: rgba(0, 128, 255, 0.3);    // 当前行号的背景颜色
+        }
+      }
+
+
+    }
     .setting-title{
       color: #566080;
       display: flex;

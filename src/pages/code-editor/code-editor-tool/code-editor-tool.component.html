@@ -1,11 +1,11 @@
 <div class="file-folder-wrapper">
-  <nz-tabset [nzTabBarExtraContent]="search" [nzTabBarStyle]="{height: '48px', paddingLeft: '24px'}">
+  <nz-tabset  [nzTabBarStyle]="{height: '48px', paddingLeft: '24px'}">
     @for (tool of tools; track tool) {
       <nz-tab [nzTitle]="titleTemplate">
         <ng-template #titleTemplate>
           <i [class]="'QILIN  '+ tool.icon" style="color: #899DB7; font-size: 48px;"></i>
         </ng-template>
-        <div class="tool-content" (contextmenu)="onContextMenu($event, clickEmpty)">
+        <div class="tool-content" >
           <ng-container *ngTemplateOutlet="tool.component"  ></ng-container>
         </div>
       </nz-tab>
@@ -13,19 +13,6 @@
   </nz-tabset>
 </div>
 
-
-<nz-dropdown-menu #clickEmpty="nzDropdownMenu">
-  <ul nz-menu>
-    <li nz-menu-item>文件</li>
-    <li nz-menu-item>文件夹</li>
-    <!--    <li nz-menu-divider></li>-->
-  </ul>
-</nz-dropdown-menu>
-
-
-<ng-template #search>
-  <i class="QILIN qilin-QT_sousuokuang_sousuo" style="font-size: 24px; color: #D0D1D6"></i>
-</ng-template>
 <ng-template #fileFolder>
   <app-file-folder #fileFolderComponent></app-file-folder>
 </ng-template>
@@ -39,65 +26,6 @@
   <app-outline-tree></app-outline-tree>
 </ng-template>
 
-
-<!--<div class="merkaba-tool-wrapper">-->
-<!--  <div class="tool-menu">-->
-<!--    <img src="../../../assets/qilin-logo.jpg" alt="qilin-logo" height="48" width="48">-->
-<!--    <div class="fengexian"></div>-->
-<!--    <ng-container *ngFor="let tool of tools;let index = index">-->
-<!--      <span (click)="changeToolStatus(tool, index)" [ngClass]="{ 'active': tool.isActive }">-->
-<!--        <i class="XPA" [ngClass]="tool.icon" style="font-size: 32px"></i>-->
-<!--      </span>-->
-<!--    </ng-container>-->
-<!--  </div>-->
-<!--  <div class="tool-content" >-->
-<!--    <as-split-->
-<!--      gutterSize="5"-->
-<!--      direction="vertical"-->
-<!--    >-->
-<!--      <as-split-area [size]="100" *ngIf="tools[0].isActive">-->
-<!--        <div class="tool-content-title">-->
-<!--          <div class="folder-info">-->
-<!--            <div class="folder-name" >亚马逊商品波动动分析-->
-<!--              &lt;!&ndash;      <span nz-icon nzType="play-circle" nzTheme="outline"></span>&ndash;&gt;-->
-<!--            </div>-->
-<!--            <div class="project-version">V2.00 </div>-->
-<!--          </div>-->
-<!--          <div class="folder-tools">-->
-<!--            <nz-input-group [nzSuffix]="suffixIconSearch" style="width: 236px">-->
-<!--              <input type="text" nz-input placeholder="输入名称" />-->
-<!--            </nz-input-group>-->
-<!--            <ng-template #suffixIconSearch>-->
-<!--              <span nz-icon nzType="search"></span>-->
-<!--            </ng-template>-->
-<!--            <i class="XPA xpa-shanchu1" (click)="removeFile()" ></i>-->
-<!--            <i class="XPA xpa-xiazai" (click)="downloadFile()"></i>-->
-<!--            <i class="XPA xpa-a-xinzeng1" (click)="addFile()"></i>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--        <div class="tool-content-item">-->
-<!--          <app-file-folder class="tool-content-item" #fileFolder></app-file-folder>-->
-<!--        </div>-->
-<!--      </as-split-area>-->
-<!--      <as-split-area [size]="30"  *ngIf="tools[1].isActive">-->
-<!--        <div style="padding-top: 0" class="tool-content-title">-->
-<!--          脚本配置-->
-<!--        </div>-->
-<!--        <div class="tool-content-item">-->
-
-<!--        </div>-->
-<!--      </as-split-area>-->
-<!--      <as-split-area [size]="30"  *ngIf="tools[2].isActive">-->
-<!--        <div style="padding-top: 0" class="tool-content-title">-->
-<!--          大纲-->
-<!--        </div>-->
-<!--        <div class="tool-content-item">-->
-<!--&lt;!&ndash;          <code-outline></code-outline>&ndash;&gt;-->
-<!--        </div>-->
-<!--      </as-split-area>-->
-<!--    </as-split>-->
-<!--  </div>-->
-<!--</div>-->
 
 
 

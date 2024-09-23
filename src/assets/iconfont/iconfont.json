@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "41875129",
+      "name": "QT_脚本_面性",
+      "font_class": "QT_jiaoben_mianxing",
+      "unicode": "e654",
+      "unicode_decimal": 58964
+    },
+    {
+      "icon_id": "41875109",
+      "name": "QT_分配节点_线性",
+      "font_class": "QT_fenpeijiedian_xianxing",
+      "unicode": "e641",
+      "unicode_decimal": 58945
+    },
+    {
       "icon_id": "41870780",
       "name": "QT_应用管理_线性",
       "font_class": "QT_yingyongguanli_xianxing",
@@ -83,13 +97,6 @@
       "unicode_decimal": 58963
     },
     {
-      "icon_id": "41870772",
-      "name": "QT_分配节点_线性",
-      "font_class": "QT_fenpeijiedian_xianxing",
-      "unicode": "e654",
-      "unicode_decimal": 58964
-    },
-    {
       "icon_id": "41870769",
       "name": "QT_团队协作_线性",
       "font_class": "QT_tuanduixiezuo_xianxing",
@@ -158,13 +165,6 @@
       "font_class": "QT_dangqianxuanzhong",
       "unicode": "e640",
       "unicode_decimal": 58944
-    },
-    {
-      "icon_id": "41870793",
-      "name": "QT_脚本_面性",
-      "font_class": "QT_jiaoben_mianxing",
-      "unicode": "e641",
-      "unicode_decimal": 58945
     },
     {
       "icon_id": "41870792",

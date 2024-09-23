@@ -1,83 +1,56 @@
-<nz-tree-view *ngIf="dataSource && treeControl" #treeView [nzTreeControl]="treeControl" [nzDataSource]="dataSource" [nzDirectoryTree]="true">
-  <nz-input-group [nzSuffix]="suffixIcon">
-    <input type="text" nz-input placeholder="Search" ngModel (ngModelChange)="searchValue$.next($event)" />
-  </nz-input-group>
-  <ng-template #suffixIcon>
-    <span nz-icon nzType="search"></span>
-  </ng-template>
-  <nz-tree-node *nzTreeNodeDef="let node" nzTreeNodePadding>
-    <nz-tree-node-toggle nzTreeNodeNoopToggle></nz-tree-node-toggle>
-    <nz-tree-node-option
-      [nzDisabled]="node.disabled"
-      [nzSelected]="selectListSelection.isSelected(node)"
-      (nzClick)="selectListSelection.toggle(node)"
-      (contextmenu)="showContextMenu($event, node)"
-      (dblclick)="toLoadScript(node)"
-    >
-      <!--   叶子结点   -->
-      <div class="list-noleaf" (contextmenu)="onContextMenu($event, clickFile, node)">
-        <ng-container *ngIf="!node.isEditing; else editMode"></ng-container>
-          <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
-          <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
-<!--    添加输入框的模板    -->
-        <ng-template #editMode>
-          <input
-            [(ngModel)]="node.name"
-            (blur)="stopEditing(node)"
-            (keydown.enter)="confirmEdit(node)"
-            class="edit-input"
-          />
-        </ng-template>
-      </div>
-    </nz-tree-node-option>
-  </nz-tree-node>
-
-  <nz-tree-node *nzTreeNodeDef="let node; when: hasChild" nzTreeNodePadding>
-    <nz-tree-node-toggle>
-      <span nz-icon nzType="caret-down" nzTreeNodeToggleRotateIcon></span>
-    </nz-tree-node-toggle>
-    <nz-tree-node-option
-      [nzDisabled]="node.disabled"
-      [nzSelected]="selectListSelection.isSelected(node)"
-      (contextmenu)="showContextMenu($event, node)"
-      (nzClick)="selectListSelection.toggle(node)"
-    >
-      <!--   非叶子结点 （肯定是文件夹）  -->
-      <div class="list-noleaf" nz-dropdown  nzOverlayClassName="list-noleaf-container"
-           (contextmenu)="onContextMenu($event, clickFolder, node)"
-      >
-        <ng-container *ngIf="!node.isEditing; else editMode">
-          <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: node}"></ng-container>
-          <ng-container *ngTemplateOutlet="treeList; context: {$implicit: node}"></ng-container>
-        </ng-container>
-        <!--    添加输入框的模板    -->
-        <ng-template #editMode>
-          <input
-            [(ngModel)]="node.name"
-            (blur)="stopEditing(node)"
-            (keydown.enter)="confirmEdit(node)"
-            class="edit-input"
-          />
-        </ng-template>
-      </div>
-    </nz-tree-node-option>
-  </nz-tree-node>
-</nz-tree-view>
-
-<ng-template #treeList let-node>
-  <div class="list-item">
-    <div class="list-item-left">
-      <span nz-tooltip [nzTooltipTitle]="node.title" class="site-name">{{ node.name }}</span>
-    </div>
-    <ng-container *ngIf="node.type===2">
-      <div class="list-item-right">
-        <span class="dev-version">V{{ node.devVersion }}</span>
-        <span class="prd-version">V{{ node.prdVersion }}</span>
-      </div>
-    </ng-container>
-  </div>
+<nz-input-group [nzSuffix]="suffixIcon"  [nzPrefix]="prefixTemplateUser" style="background-color: #121b32;border: 1px solid rgba(255, 255, 255, 0.10);">
+  <input type="text" nz-input placeholder="Search" [(ngModel)]="searchValue"/>
+</nz-input-group>
+<ng-template #suffixIcon>
+  <i class="QILIN qilin-QT_guanbi " style="color: #D0D1D6; font-size: 24px"></i>
 </ng-template>
+<ng-template #prefixTemplateUser><i class="QILIN qilin-QT_sousuokuang_sousuo" style="color: #D0D1D6; font-size: 24px" (click)="clearSearch()"></i></ng-template>
 
+<nz-tree
+  nzBlockNode
+  [nzData]="nodes"
+  (nzClick)="activeNode($event)"
+  [nzSearchValue]="searchValue"
+  (nzDblClick)="openFolder($event)"
+  [nzTreeTemplate]="nzTreeTemplate"
+  (nzSearchValueChange)="nzEvent($event)"
+  (nzContextMenu)="activeNode($event)"
+></nz-tree>
+
+<!--
+  使用弹窗之后的代码过程
+  1. 点击新建 文件/文件夹 我需要用一个标记去标记他是否是新建的填写窗口
+  2. 然后我填写完基本信息之后， 按下enter之后我才拿着这些信息去提交服务器拿去正确的信息， 最后修改标志位
+ -->
+<ng-template #nzTreeTemplate let-node let-origin="origin">
+  @if (origin.newFlag){
+<!--   新建文件之后需要获取  -->
+<!--    <app-contenteditable-input (valueChange)="onValueChange($event)" ></app-contenteditable-input>-->
+  }
+  @else{
+    <span class="custom-node">
+    @if (!node.isLeaf) {
+      <span (contextmenu)="contextMenu($event, clickFolder, node)" class="node-item-container">
+        <span class="left">
+          <ng-container *ngTemplateOutlet="treeViewIcon; context: {$implicit: origin.type}"></ng-container>
+          <span class="folder-name">{{ node.title }} </span>
+        </span>
+      </span>
+    } @else {
+      <span (contextmenu)="contextMenu($event, clickFile, node)" class="node-item-container">
+        <div class="left file-name"><ng-container
+          *ngTemplateOutlet="treeViewIcon; context: {$implicit: origin.type}"></ng-container>
+          {{ node.title }}</div>
+        <div class="right">
+            <div class="dev-version">V{{ origin.devVersion }}</div>
+            <div class="prod-version">V{{ origin.prdVersion }}</div>
+        </div>
+      </span>
+    }
+  </span>
+  }
+
+</ng-template>
 
 <!--
  通过传入的node区分下面三类
@@ -85,60 +58,78 @@
  点击文件       2. 发布 2. 重命名  3. 删除
  点击文件夹      1. 新建 1）文件夹 2）文件  2 重命名  3 删除
  -->
-<nz-dropdown-menu #clickFolder="nzDropdownMenu" >
+<nz-dropdown-menu #clickFolder="nzDropdownMenu">
   <ul nz-menu>
-    <li nz-submenu   nzTitle="新建">
-      <ul  class="list-noleaf-container" >
-        <li  nz-menu-item (click)="addNode(2)">文件</li>
-        <li nz-menu-item (click)="addNode(1)">文件夹</li>
+    <li nz-submenu nzTitle="新建">
+      <ul class="list-noleaf-container">
+        <li nz-menu-item (click)="selectFileType(2)">文件</li>
+        <li nz-menu-item (click)="selectFileType(1)">文件夹</li>
       </ul>
     </li>
-    <li nz-menu-item>发布</li>
-    <li nz-menu-item>重命名</li>
-    <li nz-menu-item>删除</li>
-<!--    <li nz-menu-divider></li>-->
+    <li nz-menu-item (click)="publish()">发布</li>
+    <li nz-menu-item (click)="selectFileType(3)">重命名</li>
+    <li nz-menu-item (click)="delete()">删除</li>
   </ul>
 </nz-dropdown-menu>
 
 <nz-dropdown-menu #clickFile="nzDropdownMenu">
   <ul nz-menu>
-    <li nz-menu-item>发布</li>
-    <li nz-menu-item>重命名</li>
-    <li nz-menu-item>删除</li>
-    <!--    <li nz-menu-divider></li>-->
+    <li nz-menu-item (click)="publish()">发布</li>
+    <li nz-menu-item (click)="selectFileType(3)">重命名</li>
+    <li nz-menu-item (click)="delete()">删除</li>
   </ul>
 </nz-dropdown-menu>
 
-
-<ng-template let-node #treeViewIcon>
-<!--  <span nz-icon [nzType]="(node.type === 1 || node.type === 0)  ? (treeControl.isExpanded(node) ? 'folder-open' : 'folder') : 'file'" nzTheme="outline"></span>-->
-  <ng-container *ngIf="node.type === 2;else otherCondition">
+<ng-template let-type #treeViewIcon>
+  <ng-container *ngIf="type === 2;else otherCondition">
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
       <g opacity="0.6">
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M3 5C3 3.34315 4.34315 2 6 2H14C15.6569 2 17 3.34315 17 5V13.5858C17 13.851 16.8946 14.1054 16.7071 14.2929L14.2929 17.7071C14.1054 17.8946 13.851 18 13.5858 18H6C4.34315 18 3 16.6569 3 15V5ZM5 6.75C5 6.33579 5.33579 6 5.75 6H12.75C13.1642 6 13.5 6.33579 13.5 6.75C13.5 7.16421 13.1642 7.5 12.75 7.5H5.75C5.33579 7.5 5 7.16421 5 6.75ZM5.75 9.5C5.33579 9.5 5 9.83579 5 10.25C5 10.6642 5.33579 11 5.75 11H10.75C11.1642 11 11.5 10.6642 11.5 10.25C11.5 9.83579 11.1642 9.5 10.75 9.5H5.75Z" fill="url(#paint0_linear_269_9011)"/>
+        <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M3 5C3 3.34315 4.34315 2 6 2H14C15.6569 2 17 3.34315 17 5V13.5858C17 13.851 16.8946 14.1054 16.7071 14.2929L14.2929 17.7071C14.1054 17.8946 13.851 18 13.5858 18H6C4.34315 18 3 16.6569 3 15V5ZM5 6.75C5 6.33579 5.33579 6 5.75 6H12.75C13.1642 6 13.5 6.33579 13.5 6.75C13.5 7.16421 13.1642 7.5 12.75 7.5H5.75C5.33579 7.5 5 7.16421 5 6.75ZM5.75 9.5C5.33579 9.5 5 9.83579 5 10.25C5 10.6642 5.33579 11 5.75 11H10.75C11.1642 11 11.5 10.6642 11.5 10.25C11.5 9.83579 11.1642 9.5 10.75 9.5H5.75Z"
+              fill="#288AD3"/>
       </g>
-      <defs>
-        <linearGradient id="paint0_linear_269_9011" x1="10" y1="7.51724" x2="11.2705" y2="18.4035" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#288AD3"/>
-          <stop offset="1" stop-color="#004E96"/>
-        </linearGradient>
-      </defs>
     </svg>
   </ng-container>
   <ng-template #otherCondition>
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <path fill-rule="evenodd" clip-rule="evenodd" d="M1 6C1 4.34315 2.34315 3 4 3H13C14.3979 3 15.5725 3.95608 15.9055 5.25H7.67703C6.96145 5.25 6.31796 5.68566 6.0522 6.35007L4.30364 10.7215C4.14981 11.106 4.33687 11.5425 4.72146 11.6964C5.10605 11.8502 5.54252 11.6631 5.69636 11.2785L7.44491 6.90715C7.48288 6.81224 7.57481 6.75 7.67703 6.75H18.1428C18.9438 7.45915 19.3544 8.58254 19.0681 9.72761L17.5681 15.7276C17.2342 17.0631 16.0343 18 14.6577 18H13H4C2.34315 18 1 16.6569 1 15V9V6Z" fill="url(#paint0_linear_269_9674)"/>
-      <defs>
-        <linearGradient id="paint0_linear_269_9674" x1="10.0796" y1="8.5" x2="10.9186" y2="18.4465" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#288AD3"/>
-          <stop offset="1" stop-color="#004E96"/>
-        </linearGradient>
-      </defs>
+      <path d="M2 4C2 3.44772 2.44772 3 3 3H9C9.55228 3 10 3.44772 10 4V5H17C17.5523 5 18 5.44772 18 6V7H2V4Z"
+            fill="#288AD3"/>
+      <path d="M18 15.5V8.5H2V15.5C2 16.6046 2.89543 17.5 4 17.5H16C17.1046 17.5 18 16.6046 18 15.5Z" fill="#288AD3"/>
     </svg>
   </ng-template>
 </ng-template>
 
+<!--  新建文件夹 新建文件夹 -->
+<!--<nz-modal-->
+<!--  nzDraggable-->
+<!--  nzCentered-->
+<!--  [(nzVisible)]="isVisible"-->
+<!--  nzTitle="Draggable Modal"-->
+<!--  (nzOnCancel)="handleCancel()"-->
+<!--  (nzOnOk)="handleOk()"-->
+<!--&gt;-->
+<!--  <ng-container *nzModalContent>-->
+<!--    <input type="text">-->
+<!--  </ng-container>-->
+<!--</nz-modal>-->
 
+
+<nz-modal
+  nzDraggable
+  [(nzVisible)]="isVisible"
+  nzClosable="false"
+  nzTitle="新建文件夹"
+  [nzFooter]=null
+>
+  <ng-container *nzModalContent>
+<!--    -->
+    <input type="text"
+           #newName
+           (keydown.enter)="handleEnter(newName.value)"
+           (keydown.escape)="isVisible = false"
+    >
+  </ng-container>
+</nz-modal>
 
 
 

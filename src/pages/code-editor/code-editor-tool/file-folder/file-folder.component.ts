@@ -1,4 +1,4 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, ElementRef, TemplateRef, ViewChild} from '@angular/core';
 import {NzIconDirective} from "ng-zorro-antd/icon";
 import {NzAutosizeDirective, NzInputDirective, NzInputGroupComponent} from "ng-zorro-antd/input";
 
@@ -29,6 +29,12 @@ import {MonacoService} from "../../../../services/monaco.service";
 import {NzContextMenuService, NzDropDownDirective, NzDropdownMenuComponent} from "ng-zorro-antd/dropdown";
 import {NzMenuDirective, NzMenuDividerDirective, NzMenuItemComponent, NzSubMenuComponent} from "ng-zorro-antd/menu";
 import {BehaviorSubject} from "rxjs";
+import {NzFormatEmitEvent, NzTreeComponent, NzTreeNode, NzTreeNodeOptions} from "ng-zorro-antd/tree";
+import {EditInputComponent} from "../../../../components/edit-input/edit-input.component";
+import {
+  ContenteditableInputComponent
+} from "../../../../components/contenteditable-input/contenteditable-input.component";
+import {NzModalComponent, NzModalContentDirective} from "ng-zorro-antd/modal";
 
 export enum EIconType {
   'xpa-wangzhan',
@@ -87,198 +93,203 @@ interface FlatNode {
     NzMenuDividerDirective,
     NzMenuDirective,
     NzDropDownDirective,
+    NzTreeComponent,
+    EditInputComponent,
+    ContenteditableInputComponent,
+    NzModalComponent,
+    NzModalContentDirective,
   ],
   templateUrl: './file-folder.component.html',
   styleUrl: './file-folder.component.scss',
 })
 export class FileFolderComponent {
-  iconType = EIconType;
-  private fileData: MerkabaRecord[] = [];
-  // 用于搜索
-  searchValue$ = new BehaviorSubject<string>('');
-  // 记录当前选中的结点
-  currentSelectNode: FlatNode;
-  // 记录当前结点展开的情况
-  expandedNodeKeys: string[] = [];
-  @ViewChild("treeView", {static: false}) treeView!: NzTreeViewComponent<FlatNode>;
-  // 扁平化
-  private transformer = (node: MerkabaRecord, level: number): FlatNode => ({
-    ...node,
-    expandable: !!node.children && node.children.length > 0,
-    name: node.name,
-    // parentRecord: node.parentRecord,
-    level,
-    disabled: false,
-    isEditing: false,
-  });
-  selectListSelection = new SelectionModel<FlatNode>();
+  // 默认创建的文件类型
+  fileType
+  @ViewChild('newName') newName: ElementRef
+  searchValue = '';
+  nodes: NzTreeNodeOptions[] = [];
 
-  treeControl = new FlatTreeControl<FlatNode>(
-    node => node.level,
-    node => node.expandable
-  );
-
-  treeFlattener = new NzTreeFlattener(
-    this.transformer,
-    node => node.level,
-    node => node.expandable,
-    node => node.children
-  );
-  dataSource = new NzTreeFlatDataSource(this.treeControl, this.treeFlattener);
+  activatedNode?: NzTreeNode;
   constructor(private service: CodeEditorService, private render: RenderService, private monaco: MonacoService,private nzContextMenuService: NzContextMenuService) {
     this.service.load({}).subscribe(resp => {
       // todo 初始化monaco的所有模块 改成按需加载
       this.monaco.initModels(resp.items).then(r => this.monaco.scriptInitLoaded.next(true));
-      this.fileData = resp.items;
-      this.dataSource.setData(resp.items);
-      console.log(resp.items);
+      // todo 实现构成nodes树状结构
+      console.log(resp.items)
+      console.log(this.transformNodes(resp.items))
+      this.nodes = this.transformNodes(resp.items);
+
     })
   }
 
-  hasChild = (_: number, node: FlatNode): boolean => node.expandable;
-
-  /**
-   * 加载脚本编辑器  所有的加载全部通过路径去加载
-   * @param e
-   */
-  toLoadScript(e){
-    this.service.scriptChannel.next({type: 'openScript', script: e, uri: e.uri});
-    this.service.scriptChannel.next({type: 'switchScript', script: e});
-  }
-
-  /**
-   *
-   */
-  showContextMenu(event: MouseEvent, node){
-    event.preventDefault();
-    event.stopPropagation();
-    this.selectListSelection.toggle(node);
-    this.currentSelectNode = node;  // 记录当前选中的结点
-  }
-
-  /**
-   *
-   */
-  onContextMenu(event, view, node){
-    this.nzContextMenuService.create(event, view);
-    console.log(node)
-  }
-
-  stopEditing(node: any){
-    node.idEditing = false;
-  }
-
-  confirmEdit(node: any): void {
-    node.isEditing = false;
-    // 在这里保存修改后的名称，执行更新逻辑
-    console.log(`Updated name: ${node.name}`);
-  }
-
-  /**
-   * 在添加文件的时候， 如果选中文件夹则在他的创建文件与子节点，如果选中文件的话，直接在他的同级创建
-   * 当前只是创建一个创建窗口 只有在输入了文件名之后才能 创建成功 否则失败
-   */
-  addNode(type: number){
-    console.log(this.currentSelectNode, this.selectListSelection.selected);
-    const newNode: FlatNode = { //
-      expandable: type === 1,   // type 1 文件夹  2 为文件
-      level: this.currentSelectNode.level + 1,
-      disabled: false,
-      isEditing: true,
-    }
-    // 然后添加到tree中
-    this.currentSelectNode.children.unshift(newNode);
-    this.dataSource.getData()
-    console.log(this.dataSource.getData());
-    console.log(this.fileData);
-    this.dataSource.setData(this.fileData);
-  }
-
-  //
-  refreshData(newData: FlatNode[]){
-
-  }
-
-  saveExpandedState(): void {
-    this.expandedNodeKeys = [];
-    this.treeControl.dataNodes.forEach(node => {
-      if (this.treeControl.isExpanded(node)) {
-        this.expandedNodeKeys.push(node.id);
+  transformNodes(dataSource, path='0'): NzTreeNodeOptions[]{
+    const list = [];
+    for (let i = 0 ;i < dataSource.length; i++) {
+      const key = dataSource[i].title;
+      const treeNode: NzTreeNodeOptions = {
+        ...dataSource[i],
+        title: dataSource[i].name,
+        key: dataSource[i].name,
+        expanded: false,
+        children: [],
+        isLeaf: false,
       }
-    });
-    console.log('Expanded Node Keys:', this.expandedNodeKeys);
+      if(dataSource[i].children){
+        treeNode.children = this.transformNodes(dataSource[i].children, dataSource[i].title)
+      }else{
+        treeNode.isLeaf = true;
+      }
+      list.push(treeNode);
+    }
+    return list;
+  }
+
+  /**
+   * 激活节点
+   * @param data
+   */
+  activeNode(data: NzFormatEmitEvent): void {
+    this.activatedNode = data.node!;
+    console.log(this.activatedNode);
+  }
+
+  selectFileType(fileType: number){
+    this.fileType = fileType;
+    this.isVisible = true;
   }
 
 
-  restoreExpandedState(): void {
-    this.expandedNodeKeys.forEach(key => {
-      const node = this.findNodeByKey(key, this.treeControl.dataNodes);
+
+  /**
+   * 右键创建菜单
+   * @param $event
+   * @param menu
+   * @param node
+   */
+  contextMenu($event, menu: NzDropdownMenuComponent, node): void {
+
+    this.activatedNode = node!;
+    console.log(this.activatedNode);
+    this.nzContextMenuService.create($event, menu);
+  }
+
+  /**
+   * 打开文件夹
+   * 是文件夹就打开 是文件双击打开文件
+   * @param data
+   */
+  openFolder(data: NzTreeNode | NzFormatEmitEvent): void {
+    // do something if u want
+    if (data instanceof NzTreeNode) {
+      data.isExpanded = !data.isExpanded;
+    } else {
+      const node = data.node;
       if (node) {
-        this.treeControl.expand(node);
+        node.isExpanded = !node.isExpanded;
       }
-    });
-  }
-
-  findNodeByKey(key: string, nodes: FlatNode[]): FlatNode | null {
-    for (const node of nodes) {
-      if (node.id === key) {
-        return node;
-      }
+      this.service.scriptChannel.next({type: 'openScript', script: data.node.origin , uri: data.node.origin['uri']});
+      this.service.scriptChannel.next({type: 'switchScript', script: data.node.origin});
     }
-    return null;
   }
 
+  nzEvent(event: NzFormatEmitEvent): void {
+    console.log(event);
+  }
 
+  isVisible = false;
+
+  handleEnter(name){
+    console.log()
+    switch (this.fileType){
+      case 1:
+        this.createFile(name, this.fileType)
+        break;
+      case 2:
+        this.createFile(name, this.fileType);
+        break;
+      case 3:
+        this.rename(name);
+    }
+    this.isVisible = false;
+  }
+
+  clearSearch(){
+    console.log("exe")
+    this.searchValue = ' ';
+    console.log(this.searchValue)
+  }
+
+  /**
+   * 创建文件，文件夹
+   * @param name
+   * @param type
+   */
+  createFile(name, type){
+    // todo 创建文件同步到服务器
+    // this.service.
+
+    const node: NzTreeNodeOptions = {
+      title: name,
+      key: name,
+      expanded: false,
+      children: [],
+      isLeaf: true,
+      type: type,  //新建文件
+    }
+    this.activatedNode.isLeaf = false;
+    this.activatedNode.origin.isLeaf = false;
+    this.activatedNode.addChildren([node], this.activatedNode.children.length)
+  }
+
+  /**
+   * 给文件，文件夹重命名
+   */
+  rename(name: string){
+    this.activatedNode.title = name;
+    this.activatedNode.key = name;
+    // todo 同步服务器
+  }
+
+  /**
+   * 删除文件或文件夹
+   */
+  delete(){
+    this.activatedNode.remove();
+
+    // todo 同步服务器
+    // this.service.
+  }
+
+  /**
+   * 发布新的脚本
+   */
+  publish(){
+    // todo 发布新的脚本
+    this.service.publishScript(this.activatedNode.origin['id']).subscribe(resp => {
+      console.log(resp)
+      this.activatedNode.origin['prdVersion'] = resp.version;
+    })
+  }
 
   /**
    *下载脚本代码
    */
-  downloadFile() {
-    // todo 下载功能放在这可能会选中文件夹
-    let downloadRecord = this.selectListSelection.selected[0];
-    this.service.readScript(downloadRecord.id).subscribe((resp: MerkabaScript) => {
-      const data = resp.content;
-      console.log(data);
-      const blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = resp.name + '-' + resp.version + ".js";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
-  }
+  // downloadFile() {
+  //   // todo 下载功能放在这可能会选中文件夹
+  //   let downloadRecord = this.selectListSelection.selected[0];
+  //   this.service.readScript(downloadRecord.id).subscribe((resp: MerkabaScript) => {
+  //     const data = resp.content;
+  //     console.log(data);
+  //     const blob = new Blob([data], {type: 'text/plain;charset=utf-8'});
+  //     const url = URL.createObjectURL(blob);
+  //     const a = document.createElement('a');
+  //     a.href = url;
+  //     a.download = resp.name + '-' + resp.version + ".js";
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     document.body.removeChild(a);
+  //     URL.revokeObjectURL(url);
+  //   });
+  // }
 
-  /**
-   * 脚本新版本的发布
-   */
-  publishScript(node: FlatNode) {
-    this.service.publishScript(node.id).subscribe(resp => {
-      let record = this.selectListSelection.selected[0];
-      record.prdVersion = resp.version;
-
-      // 更新本地树节点数据
-      this.updateNodeVersion(this.fileData, node.id, resp.version);
-
-      // 重新设置数据源以刷新 TreeView
-      this.dataSource.setData(this.fileData);
-
-      this.render.success("发布成功");
-    });
-  }
-
- // 更新本地树节点的版本号
-  updateNodeVersion(nodes: MerkabaRecord[], nodeId: string, newVersion: number) {
-    for (let node of nodes) {
-      if (node.id === nodeId) {
-        node.prdVersion = newVersion;
-        break;
-      }
-      if (node.children && node.children.length > 0) {
-        this.updateNodeVersion(node.children, nodeId, newVersion);
-      }
-    }
-  }
 }

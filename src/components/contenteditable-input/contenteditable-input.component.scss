@@ -1,0 +1,29 @@
+.element-box {
+  position: relative;
+}
+
+.show-text {
+  word-break: break-all;
+  white-space: pre-line;
+}
+
+.textbox {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  .textbox-container {
+    width: 100%;
+    position: absolute;
+    border: 1px dashed #000;
+    height: auto;
+    word-break: break-word;
+    outline: none;
+    white-space: pre-wrap;
+    box-sizing: content-box;
+    user-select: text !important;
+    caret-color: black;
+  }
+}

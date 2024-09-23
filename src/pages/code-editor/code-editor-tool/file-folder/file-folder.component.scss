@@ -1,54 +1,58 @@
 @import "../../../../../node_modules/ng-zorro-antd/ng-zorro-antd.min.css";
 @import "../../../../assets/iconfont/iconfont.css";
 
-::ng-deep .ant-tree-node-folder:hover {
-  background-color: #654321 !important; /* 文件夹类型节点悬浮时的颜色 */
-}
-.ant-tree.ant-tree-directory{
-  .ant-tree-treenode-selected::before, .ant-tree-treenode-selected:hover::before{
-    background: #323e56;
+::ng-deep .ant-tree-list{
+  background: #111b31;
+  color: #EBECEF;
+
+  .ant-tree-treenode nz-tree-node-title.ant-tree-node-content-wrapper.ant-tree-node-selected{
+    background-color: #333E57;
   }
-  .ant-tree-treenode:hover::before:hover{
-    background: #323e56;
-  }
-}
-::ng-deep .ant-tree{
-  .list-noleaf{
+  .ant-tree-treenode nz-tree-node-title.ant-tree-node-content-wrapper{
     display: flex;
+
+  }
+  .custom-node.ng-star-inserted{
     width: 100%;
-  }
-  .cdk-tree-node{
-    height: 32px;
-    line-height: 32px;
+    .node-item-container{
+      display: flex;
+      justify-content:space-between;
+      .left{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .right{
 
-    color: #899DB7;
-    //color: #323e56;
-  }
-
-}
-
-.list-item {
-  width: 100%;
-  padding-right: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  .list-item-right{
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    align-items: center;
-    color: var(---1, #EBECEF);
-
-    .prd-version{
-      min-width: 47px;;
-      border-radius: 4px;
-      border: 1px solid var(---4, #566080);
-      text-align: center;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        .prod-version{
+          color: #899DB7;
+          border-radius: 4px;
+          border: 1px solid #566080;
+          padding: 3px 8px;
+        }
+      }
     }
   }
+  .ant-tree-treenode nz-tree-node-title.ant-tree-node-content-wrapper:hover{
+    background-color: #333E57;
+  }
 }
+
+::ng-deep nz-input-group.ant-input-affix-wrapper{
+  background-color: #121b32;
+
+  color: #EBECEF;
+  height: 48px;
+  margin-bottom: 24px;
+  input.ant-input{
+    background: #121b32;
+    color: #EBECEF;
+  }
+}
+
 
 ::ng-deep .ant-dropdown{
   background: #323e56;
@@ -94,20 +98,26 @@
     }
   }
 }
-//ul{
-//  padding: 8px;
-//  font-size: 14px;
-//  color: inherit;
-//  border-radius: 4px;
-//}
-//li{
-//  width: 104px;
-//  height: 32px;
-//  line-height: 32px;
-//}
+::ng-deep .ant-modal .ant-modal-content{
+  border-radius: 10px;
+  .ant-modal-header{
+    background-color: #2b2d30;
+    color: #dfe1e5;
+    border-bottom: 1px solid black;
+    .ant-modal-title{
+      color: #dfe1e5;
+    }
+  }
+  .ant-modal-body{
+    background-color: #2b2d30;
+    padding: 0 3px;
+    input{
+      width: 100%;
+      background-color: #2b2d30;
+      outline: none;
+      color: #dfe1e5;
+    }
+  }
+}
 
-//li:hover .ant-menu-title-content{
-//  background: #52617e;
-//  cursor: pointer;
-//  color: #EBECEF
-//}
+

@@ -1,0 +1,20 @@
+<section class="element-box">
+  <!-- 展示部分 -->
+  <div class="show" *ngIf="!isEdit">
+    <div
+      class="show-text"
+      (dblclick)="editText()"
+      [innerText]="text"
+    ></div>
+  </div>
+  <!-- 编辑部分 -->
+  <div #textBox class="textbox" *ngIf="isEdit">
+    <div
+      class="textbox-container"
+      contenteditable="true"
+      (blur)="updateText()"
+      id="textbox"
+      [innerText]="text"
+    ></div>
+  </div>
+</section>

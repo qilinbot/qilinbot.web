@@ -104,8 +104,5 @@ export class CodeEditorToolComponent implements AfterViewInit {
     }
   }
 
-  onContextMenu(event, view){
-    this.nzContextMenuService.create(event, view);
-  }
 
 }

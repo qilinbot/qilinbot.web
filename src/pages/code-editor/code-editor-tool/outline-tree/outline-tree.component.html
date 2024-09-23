@@ -5,6 +5,7 @@
     (nzClick)="activeNode($event)"
     (nzDblClick)="openFolder($event)"
     [nzTreeTemplate]="nzTreeTemplate"
+    nzMultiple="false"
     nzExpandAll="true"
   ></nz-tree>
   <ng-template #nzTreeTemplate let-node let-origin="origin">
@@ -24,16 +25,19 @@
   </ng-template>
 </div>
 
+
+<!-- 图标有点问题  -->
 <ng-template let-kind #icon>
+
   <div>
-    @if(kind === 'function') {
-      <i class="QILIN qilin-QT_dagang_fangfa"></i>
+    @if(kind == 'function') {
+      <i class="QILIN qilin-QT_jiedianliebiao_xianxing"></i>
     }
-    @else if(kind === 'class') {
-      <i class="QILIN qilin-QT_dagang_lei"></i>
+    @else if(kind == 'class') {
+      <i class="QILIN qilin-QT_jiedianliebiao_xianxing"></i>
     }
     @else{
-      <i class="QILIN qilin-QT_dagang_P"></i>
+      <i class="QILIN qilin-QT_tuanduixiezuo_xianxing">{{ kind }}</i>
     }
   </div>
 </ng-template>

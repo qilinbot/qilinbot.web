@@ -1,8 +1,8 @@
 @font-face {
   font-family: "QILIN"; /* Project id 4680057 */
-  src: url('iconfont.woff2') format('woff2'),
-       url('iconfont.woff') format('woff'),
-       url('iconfont.ttf') format('truetype');
+  src: url('iconfont.woff2?t=1727059056402') format('woff2'),
+       url('iconfont.woff?t=1727059056402') format('woff'),
+       url('iconfont.ttf?t=1727059056402') format('truetype');
 }
 
 .QILIN {
@@ -11,6 +11,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.qilin-QT_jiaoben_mianxing:before {
+  content: "\e654";
+}
+
+.qilin-QT_fenpeijiedian_xianxing:before {
+  content: "\e641";
 }
 
 .qilin-QT_yingyongguanli_xianxing:before {
@@ -57,10 +65,6 @@
   content: "\e653";
 }
 
-.qilin-QT_fenpeijiedian_xianxing:before {
-  content: "\e654";
-}
-
 .qilin-QT_tuanduixiezuo_xianxing:before {
   content: "\e655";
 }
@@ -99,10 +103,6 @@
 
 .qilin-QT_dangqianxuanzhong:before {
   content: "\e640";
-}
-
-.qilin-QT_jiaoben_mianxing:before {
-  content: "\e641";
 }
 
 .qilin-QT_bianliang_xianxing:before {

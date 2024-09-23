@@ -113,4 +113,5 @@ export class OutlineTreeComponent {
     // this.activatedNode = data.node!;
   }
 
+    protected readonly JSON = JSON;
 }

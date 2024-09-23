@@ -67,7 +67,7 @@ export interface IScriptOutLine {
 export interface IScriptEvent {
   type: 'needCurrentScript' | 'showScriptParams' | 'removeScript' | 'updateTree' | 'runScript'
     | 'updateScript' | 'currentScript' | 'openScript' | 'updateTreeData' | 'closeScript' | 'switchScript' | 'switchTab'
-  script?: MerkabaScript
+  script?: any
   scripts?: Array<MerkabaScript>
   scriptOutLine?: IScriptOutLine
   uri?: string,

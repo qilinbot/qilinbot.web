@@ -23,7 +23,7 @@ import {AceComponent, AceModule,} from "ngx-ace-wrapper";
 export class EditorSettingsComponent {
   @ViewChild('jsonEditor') jsonEditor : AceComponent;
   mode: 'code' | 'view' = "code";
-  data = {
+  data: any = {
     'simple key': 'simple value',
     numbers: 1234567,
     'simple list': ['value1', 22222, 'value3'],
@@ -43,26 +43,13 @@ export class EditorSettingsComponent {
   get code(){
     return JSON.stringify(this.data, null, 2);
   }
-
-
-  // 只有在按下
+  // 只要是符合规范的就没有问题  只要是当前不符合json的规范就无法切换view
 
   set code(data){
-    // todo 报错
     this.data = JSON.parse(data)
     console.log(this.data);
-    // try {
-    //
-    // } catch (e) {
-    //   console.error("occored error when typing the JSON", e);
-    // }
+
   }
 
-  config;
-
-  ngAfterViewInit(){
-    let config = this.jsonEditor.getConfig()
-    console.log(config);
-  }
   protected readonly ArgusConfig = ArgusConfig;
 }

@@ -75,6 +75,7 @@ export class CodeEditorBodyComponent implements AfterViewInit{
         case "openScript":
           if(e.script.type !== 2) return;
           this.openScriptEditor(e.uri, e.script);
+          console.log('222');
           break;
 
         case "switchTab":

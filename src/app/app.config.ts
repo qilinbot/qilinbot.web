@@ -16,6 +16,7 @@ import {LoginWebGuard} from "../Guard/login.web.guard";
 import {UserService} from "../services/user.service";
 import {routes} from "./app.routes";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {NzModalService} from "ng-zorro-antd/modal";
 
 
 export function initializeApp() {
@@ -53,6 +54,7 @@ export const appConfig = {
     UserService,
     AuthWebGuard,
     LoginWebGuard,
+    NzModalService,
     provideHttpClient(),
     {
       provide: APP_INITIALIZER,
